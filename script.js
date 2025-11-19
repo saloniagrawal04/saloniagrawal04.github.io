@@ -923,27 +923,287 @@ function initModal() {
             }
         },
         gc: {
-            title: 'Globular Cluster Dynamics',
+            title: 'Globular Clusters',
             advisor: 'Prof. Kyle Kremer',
             description: `
-                <p>Globular clusters are dense stellar systems containing hundreds of thousands of stars, 
-                serving as natural laboratories for studying stellar dynamics and compact object formation. 
-                My work focuses on understanding the long-term evolution of these systems through N-body simulations.</p>
+                <p style="margin-bottom: 2rem;">Globular clusters are dense, gravitationally bound star systems containing hundreds of thousands of stars. They are natural laboratories for studying stellar dynamics, black hole retention, binary evolution, and the pathways that form exotic objects like X-ray binaries and millisecond pulsars.</p>
                 
-                <h3>Research Focus</h3>
-                <ul>
-                    <li>Black hole retention and dynamical evolution in dense stellar environments</li>
-                    <li>Binary star formation and evolution through dynamical interactions</li>
-                    <li>Mass segregation and core collapse in globular clusters</li>
-                    <li>Comparison of simulation results with observational data</li>
-                </ul>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Sparse vs Dense Stellar Environments</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
+                    <div>
+                        <canvas id="sparse-field" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">Typical stellar environment — low interaction rate.</p>
+                    </div>
+                    <div>
+                        <canvas id="dense-cluster" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">Globular cluster core — high encounter and collision rates.</p>
+                    </div>
+                </div>
+                <p style="font-style: italic; color: #cbd5e1; margin-bottom: 2rem;">The extreme stellar densities in globular clusters lead to frequent dynamical interactions that reshape the entire system.</p>
                 
-                <h3>Computational Methods</h3>
-                <p>I use the CMC (Cluster Monte Carlo) code to simulate globular cluster evolution over billions 
-                of years, tracking individual stellar interactions and compact object formation. This work requires 
-                high-performance computing resources and careful analysis of large simulation datasets.</p>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Radial Density Profile (King Model)</h3>
+                <div style="margin-bottom: 1rem;">
+                    <canvas id="king-profile" width="600" height="250" style="width: 100%; max-width: 600px; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                </div>
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem;">Radial density profiles reveal the structure of the cluster and help model its dynamical evolution.</p>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Three-Body Interactions</h3>
+                <div style="margin-bottom: 1rem;">
+                    <canvas id="three-body" width="400" height="250" style="width: 100%; max-width: 400px; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                </div>
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem;">Frequent three-body encounters harden binaries and drive the long-term evolution of the cluster.</p>
+                
+                <p style="margin-top: 2rem;">Using simulations like CMC-COSMIC, we follow these interactions across billions of years to understand how star clusters form black holes, binaries, and exotic stellar remnants.</p>
             `,
-            collaborators: ['Prof. Kyle Kremer', 'CIERA Northwestern']
+            collaborators: ['Prof. Kyle Kremer', 'CIERA Northwestern'],
+            initVisuals: function () {
+                // Draw sparse stellar field
+                const sparseCanvas = document.getElementById('sparse-field');
+                if (sparseCanvas) {
+                    const ctx = sparseCanvas.getContext('2d');
+                    const w = sparseCanvas.width;
+                    const h = sparseCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Draw ~20 widely spaced stars
+                    for (let i = 0; i < 20; i++) {
+                        const x = Math.random() * w;
+                        const y = Math.random() * h;
+                        const size = Math.random() * 2 + 1;
+
+                        // Star with glow
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.shadowBlur = 0;
+                }
+
+                // Draw dense cluster core
+                const denseCanvas = document.getElementById('dense-cluster');
+                if (denseCanvas) {
+                    const ctx = denseCanvas.getContext('2d');
+                    const w = denseCanvas.width;
+                    const h = denseCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    const cx = w / 2;
+                    const cy = h / 2;
+
+                    // Draw ~150 stars concentrated toward center
+                    for (let i = 0; i < 150; i++) {
+                        // Use Gaussian distribution for clustering
+                        const angle = Math.random() * Math.PI * 2;
+                        const r = Math.abs(Math.random() * 30 + Math.random() * 30); // Concentrated distribution
+                        const x = cx + Math.cos(angle) * r;
+                        const y = cy + Math.sin(angle) * r;
+                        const size = Math.random() * 1.5 + 0.5;
+
+                        if (x >= 0 && x <= w && y >= 0 && y <= h) {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.shadowBlur = 6;
+                            ctx.shadowColor = '#60a5fa';
+                            ctx.beginPath();
+                            ctx.arc(x, y, size, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    ctx.shadowBlur = 0;
+                }
+
+                // Draw King profile
+                const kingCanvas = document.getElementById('king-profile');
+                if (kingCanvas) {
+                    const ctx = kingCanvas.getContext('2d');
+                    const w = kingCanvas.width;
+                    const h = kingCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Axes
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(60, h - 40);
+                    ctx.lineTo(w - 30, h - 40);
+                    ctx.moveTo(60, 20);
+                    ctx.lineTo(60, h - 40);
+                    ctx.stroke();
+
+                    // Labels
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '12px monospace';
+                    ctx.fillText('Radius (pc)', w / 2 - 30, h - 10);
+                    ctx.save();
+                    ctx.translate(20, h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText('Density', -25, 0);
+                    ctx.restore();
+
+                    // Radius tick marks
+                    ctx.font = '10px monospace';
+                    const radii = [0, 5, 10, 15, 20];
+                    radii.forEach(r => {
+                        const x = 60 + (w - 90) * r / 20;
+                        ctx.fillText(r.toString(), x - 5, h - 25);
+                    });
+
+                    // Draw King profile curve
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#60a5fa';
+                    ctx.beginPath();
+
+                    const rc = 3; // Core radius
+                    const rt = 20; // Tidal radius
+
+                    for (let x = 60; x < w - 30; x++) {
+                        const r = (x - 60) / (w - 90) * rt;
+
+                        // King model approximation
+                        let density;
+                        if (r < rc) {
+                            // Flat core
+                            density = 1.0;
+                        } else if (r < rt) {
+                            // Power law decline
+                            density = Math.pow(1 + (r / rc) * (r / rc), -1.5);
+                        } else {
+                            density = 0;
+                        }
+
+                        const y = h - 40 - density * 150;
+
+                        if (x === 60) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Annotations
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '11px sans-serif';
+                    ctx.fillText('Core', 100, 50);
+                    ctx.fillText('Halo', w - 100, h - 80);
+
+                    // Dashed line for core radius
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([3, 3]);
+                    const rcX = 60 + (w - 90) * rc / rt;
+                    ctx.beginPath();
+                    ctx.moveTo(rcX, h - 40);
+                    ctx.lineTo(rcX, 50);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Draw three-body interaction
+                const threeBodyCanvas = document.getElementById('three-body');
+                if (threeBodyCanvas) {
+                    const ctx = threeBodyCanvas.getContext('2d');
+                    const w = threeBodyCanvas.width;
+                    const h = threeBodyCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    const cx = w / 2;
+                    const cy = h / 2;
+
+                    // Binary system (two stars orbiting)
+                    const star1X = cx - 30;
+                    const star1Y = cy;
+                    const star2X = cx + 30;
+                    const star2Y = cy;
+
+                    // Draw orbital path
+                    ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, 35, 20, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Binary stars
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#60a5fa';
+                    ctx.beginPath();
+                    ctx.arc(star1X, star1Y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(star2X, star2Y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Intruder star
+                    const intruderX = cx - 100;
+                    const intruderY = cy - 60;
+                    ctx.fillStyle = '#f87171';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#f87171';
+                    ctx.beginPath();
+                    ctx.arc(intruderX, intruderY, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Approach arrow
+                    ctx.strokeStyle = '#f87171';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(intruderX + 10, intruderY + 10);
+                    ctx.lineTo(cx - 50, cy - 20);
+                    ctx.stroke();
+
+                    // Arrowhead
+                    ctx.fillStyle = '#f87171';
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 50, cy - 20);
+                    ctx.lineTo(cx - 55, cy - 25);
+                    ctx.lineTo(cx - 52, cy - 15);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Ejection arrow (one star gets kicked out)
+                    const ejectX = cx + 100;
+                    const ejectY = cy + 60;
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx + 40, cy + 10);
+                    ctx.lineTo(ejectX - 10, ejectY - 10);
+                    ctx.stroke();
+
+                    // Arrowhead
+                    ctx.fillStyle = '#10b981';
+                    ctx.beginPath();
+                    ctx.moveTo(ejectX - 10, ejectY - 10);
+                    ctx.lineTo(ejectX - 15, ejectY - 15);
+                    ctx.lineTo(ejectX - 5, ejectY - 12);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Labels
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '11px sans-serif';
+                    ctx.fillText('Binary', cx - 20, cy - 30);
+                    ctx.fillText('Intruder', intruderX - 25, intruderY - 15);
+                    ctx.fillText('Ejected', ejectX - 20, ejectY + 5);
+
+                    // Energy exchange annotation
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText('Energy transfer →', cx - 60, h - 30);
+                    ctx.fillText('Binary hardens', cx - 50, h - 15);
+                }
+            }
         },
         dm: {
             title: 'Dark Matter Detection with XENONnT',
