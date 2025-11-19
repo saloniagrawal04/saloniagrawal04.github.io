@@ -1206,27 +1206,322 @@ function initModal() {
             }
         },
         dm: {
-            title: 'Dark Matter Detection with XENONnT',
+            title: 'Dark Matter Detection (XENONnT)',
             advisor: 'Prof. Kaixuan Ni',
             description: `
-                <p>Dark matter constitutes approximately 85% of the matter in the universe, yet its nature 
-                remains one of physics' greatest mysteries. I contribute to the XENONnT experiment, which searches 
-                for Weakly Interacting Massive Particles (WIMPs) using a liquid xenon time projection chamber.</p>
+                <p style="margin-bottom: 2rem;">The XENON experiment searches for dark matter using a dual-phase liquid xenon detector deep underground. Interactions inside the xenon produce tiny flashes of light that allow us to reconstruct particle energies, positions, and event types.</p>
                 
-                <h3>My Contributions</h3>
-                <ul>
-                    <li>Background characterization and reduction in the XENONnT detector</li>
-                    <li>Development of analysis tools for identifying and rejecting background events</li>
-                    <li>Monte Carlo simulations of detector response and background sources</li>
-                    <li>Data quality monitoring and calibration studies</li>
-                </ul>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">S1 and S2 Signals</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
+                    <div>
+                        <canvas id="s1-signal" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">S1: Prompt scintillation from particle interaction.</p>
+                    </div>
+                    <div>
+                        <canvas id="s2-signal" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">S2: Electrons drift & create delayed electroluminescence.</p>
+                    </div>
+                </div>
+                <p style="font-style: italic; color: #cbd5e1; margin-bottom: 2rem;">The timing and size of the S1 and S2 signals let us infer the event's depth, position, and type.</p>
                 
-                <h3>Experimental Techniques</h3>
-                <p>The XENONnT detector is located deep underground in the Gran Sasso National Laboratory in Italy, 
-                shielded from cosmic rays. I work on analyzing the detector data to distinguish potential dark matter 
-                signals from various background sources including radioactive decays and neutron interactions.</p>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Delayed Single-Electron Bursts</h3>
+                <div style="margin-bottom: 1rem;">
+                    <canvas id="delayed-electrons" width="600" height="200" style="width: 100%; max-width: 600px; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                </div>
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem;">Delayed single-electron emissions can mimic low-energy events, so identifying and matching them is essential.</p>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Matching Algorithm</h3>
+                <div style="margin-bottom: 1rem;">
+                    <canvas id="matching-algorithm" width="600" height="250" style="width: 100%; max-width: 600px; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                </div>
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem;">Matching single-electron bursts to their parent S2 signal improves background rejection and event reconstruction.</p>
+                
+                <p style="margin-top: 2rem;">This analysis helps distinguish true low-energy interactions from detector artifacts, strengthening the search for rare dark matter signals.</p>
             `,
-            collaborators: ['Prof. Kaixuan Ni', 'XENON Collaboration']
+            collaborators: ['Prof. Kaixuan Ni', 'XENON Collaboration'],
+            initVisuals: function () {
+                // Draw S1 signal
+                const s1Canvas = document.getElementById('s1-signal');
+                if (s1Canvas) {
+                    const ctx = s1Canvas.getContext('2d');
+                    const w = s1Canvas.width;
+                    const h = s1Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Draw particle interaction
+                    const interactionY = h - 60;
+                    ctx.fillStyle = '#f87171';
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = '#f87171';
+                    ctx.beginPath();
+                    ctx.arc(w / 2, interactionY, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Draw S1 light flash (radial)
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (Math.PI * 2 * i) / 8;
+                        const length = 25;
+                        ctx.strokeStyle = '#60a5fa';
+                        ctx.lineWidth = 2;
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#60a5fa';
+                        ctx.beginPath();
+                        ctx.moveTo(w / 2, interactionY);
+                        ctx.lineTo(w / 2 + Math.cos(angle) * length, interactionY + Math.sin(angle) * length);
+                        ctx.stroke();
+                    }
+                    ctx.shadowBlur = 0;
+
+                    // Label
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '11px sans-serif';
+                    ctx.fillText('Prompt scintillation', w / 2 - 50, 30);
+                    ctx.fillText('(S1)', w / 2 - 10, 45);
+                }
+
+                // Draw S2 signal
+                const s2Canvas = document.getElementById('s2-signal');
+                if (s2Canvas) {
+                    const ctx = s2Canvas.getContext('2d');
+                    const w = s2Canvas.width;
+                    const h = s2Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Interaction point
+                    const interactionY = h - 60;
+                    ctx.fillStyle = '#f87171';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#f87171';
+                    ctx.beginPath();
+                    ctx.arc(w / 2, interactionY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Drifting electrons
+                    for (let i = 0; i < 4; i++) {
+                        const y = interactionY - 20 - i * 15;
+                        const x = w / 2 + (Math.sin(i) * 5);
+                        ctx.fillStyle = '#60a5fa';
+                        ctx.shadowBlur = 6;
+                        ctx.shadowColor = '#60a5fa';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.shadowBlur = 0;
+
+                    // Drift arrow
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(w / 2, interactionY - 10);
+                    ctx.lineTo(w / 2, 40);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // S2 light at top
+                    const s2Y = 30;
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (Math.PI * 2 * i) / 12;
+                        const length = 20;
+                        ctx.strokeStyle = '#10b981';
+                        ctx.lineWidth = 2;
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = '#10b981';
+                        ctx.beginPath();
+                        ctx.moveTo(w / 2, s2Y);
+                        ctx.lineTo(w / 2 + Math.cos(angle) * length, s2Y + Math.sin(angle) * length);
+                        ctx.stroke();
+                    }
+                    ctx.shadowBlur = 0;
+
+                    // Labels
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText('Electroluminescence', w / 2 + 30, 25);
+                    ctx.fillText('(S2)', w / 2 + 50, 38);
+                    ctx.fillText('Drift', w / 2 + 10, h / 2);
+                }
+
+                // Draw delayed electron bursts
+                const delayedCanvas = document.getElementById('delayed-electrons');
+                if (delayedCanvas) {
+                    const ctx = delayedCanvas.getContext('2d');
+                    const w = delayedCanvas.width;
+                    const h = delayedCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Time axis
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(50, h - 30);
+                    ctx.lineTo(w - 30, h - 30);
+                    ctx.stroke();
+
+                    // Labels
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '11px monospace';
+                    ctx.fillText('Time (μs)', w / 2 - 25, h - 5);
+
+                    // Large S2 peak
+                    const s2X = 150;
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#10b981';
+                    ctx.beginPath();
+                    for (let x = s2X - 30; x < s2X + 30; x++) {
+                        const dx = x - s2X;
+                        const y = h - 30 - 80 * Math.exp(-(dx * dx) / 200);
+                        if (x === s2X - 30) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Label S2
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText('S2', s2X - 8, 40);
+
+                    // Delayed single electrons
+                    const delays = [250, 320, 410, 480];
+                    delays.forEach((x, i) => {
+                        ctx.strokeStyle = '#f87171';
+                        ctx.lineWidth = 2;
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#f87171';
+                        ctx.beginPath();
+                        for (let dx = x - 8; dx < x + 8; dx++) {
+                            const offset = dx - x;
+                            const y = h - 30 - 20 * Math.exp(-(offset * offset) / 15);
+                            if (dx === x - 8) ctx.moveTo(dx, y);
+                            else ctx.lineTo(dx, y);
+                        }
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+
+                        // Mark as delayed
+                        if (i === 0) {
+                            ctx.fillStyle = '#f87171';
+                            ctx.font = '9px sans-serif';
+                            ctx.fillText('Delayed', x - 18, h - 50);
+                            ctx.fillText('SE', x - 8, h - 38);
+                        }
+                    });
+                }
+
+                // Draw matching algorithm
+                const matchCanvas = document.getElementById('matching-algorithm');
+                if (matchCanvas) {
+                    const ctx = matchCanvas.getContext('2d');
+                    const w = matchCanvas.width;
+                    const h = matchCanvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Timeline
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(50, h / 2);
+                    ctx.lineTo(w - 50, h / 2);
+                    ctx.stroke();
+
+                    // S2 peak
+                    const s2X = 120;
+                    ctx.fillStyle = '#10b981';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#10b981';
+                    ctx.beginPath();
+                    ctx.arc(s2X, h / 2, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '11px sans-serif';
+                    ctx.fillText('S2', s2X - 8, h / 2 - 20);
+
+                    // Delayed electrons
+                    const delays = [
+                        { x: 220, y: h / 2 + 50 },
+                        { x: 320, y: h / 2 + 70 },
+                        { x: 420, y: h / 2 + 60 }
+                    ];
+
+                    delays.forEach((pos, i) => {
+                        // Delayed electron
+                        ctx.fillStyle = '#f87171';
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#f87171';
+                        ctx.beginPath();
+                        ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+
+                        // Matching arrow
+                        ctx.strokeStyle = '#60a5fa';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([4, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(s2X + 10, h / 2 + 5);
+                        ctx.lineTo(pos.x - 8, pos.y - 5);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        // Arrowhead
+                        ctx.fillStyle = '#60a5fa';
+                        ctx.beginPath();
+                        ctx.moveTo(pos.x - 8, pos.y - 5);
+                        ctx.lineTo(pos.x - 12, pos.y - 8);
+                        ctx.lineTo(pos.x - 6, pos.y - 10);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        if (i === 0) {
+                            ctx.fillStyle = '#cbd5e1';
+                            ctx.font = '9px sans-serif';
+                            ctx.fillText('Delayed SE', pos.x - 25, pos.y + 20);
+                        }
+                    });
+
+                    // Algorithm label
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.font = '11px sans-serif';
+                    ctx.fillText('Matching Algorithm', w / 2 - 50, 30);
+
+                    // Position reconstruction
+                    ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
+                    ctx.lineWidth = 1;
+                    const gridX = w - 120;
+                    const gridY = h - 80;
+                    for (let i = 0; i < 4; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(gridX, gridY + i * 15);
+                        ctx.lineTo(gridX + 60, gridY + i * 15);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(gridX + i * 15, gridY);
+                        ctx.lineTo(gridX + i * 15, gridY + 45);
+                        ctx.stroke();
+                    }
+
+                    ctx.fillStyle = '#10b981';
+                    ctx.beginPath();
+                    ctx.arc(gridX + 30, gridY + 22, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('Position', gridX + 5, gridY - 5);
+                }
+            }
         },
         ml: {
             title: 'Machine Learning for Particle Physics',
