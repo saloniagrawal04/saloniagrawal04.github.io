@@ -1,13 +1,27 @@
 /* ==========================================================================
-   GK STYLE THEME (With Nebula Parallax)
+   GK STYLE THEME (With Starry Background)
    ========================================================================== */
 
 /* Color codes */
 $gk-bg: #050505;
-/* Darker black for space */
 $gk-text: #ffffff;
 $gk-link: #58a6ff;
 $gk-link-hover: #88c0ff;
+
+/* Star Generation Function */
+@function multiple-box-shadow($n) {
+    $value: '#{random(2000)}px #{random(2000)}px #FFF';
+
+    @for $i from 2 through $n {
+        $value: '#{$value} , #{random(2000)}px #{random(2000)}px #FFF';
+    }
+
+    @return unquote($value);
+}
+
+$shadows-small: multiple-box-shadow(700);
+$shadows-medium: multiple-box-shadow(200);
+$shadows-big: multiple-box-shadow(100);
 
 /* GK Style theme for the site */
 html[data-theme="gk-style"] {
@@ -24,11 +38,10 @@ html[data-theme="gk-style"] {
     line-height: 1.6;
     height: 100%;
     overflow: hidden;
-    /* Prevent scrollbars from background movement */
 }
 
 html[data-theme="gk-style"] body {
-    background-color: var(--global-bg-color);
+    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
     color: var(--global-text-color);
     display: flex;
     justify-content: center;
@@ -39,29 +52,80 @@ html[data-theme="gk-style"] body {
     text-align: left;
 }
 
-/* Nebula Background Animation */
-html[data-theme="gk-style"] body::before {
-    content: "";
+/* Star Animations */
+html[data-theme="gk-style"] #stars {
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    box-shadow: $shadows-small;
+    animation: animStar 50s linear infinite;
     position: fixed;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    background: url('/assets/images/nebula_bg.png') no-repeat center center;
-    background-size: cover;
-    z-index: -1;
-    animation: nebulaDrift 120s infinite alternate ease-in-out;
-    opacity: 0.6;
-    /* Subtle visibility */
+    top: 0;
+    left: 0;
+    z-index: -3;
+
+    &:after {
+        content: " ";
+        position: absolute;
+        top: 2000px;
+        width: 1px;
+        height: 1px;
+        background: transparent;
+        box-shadow: $shadows-small;
+    }
 }
 
-@keyframes nebulaDrift {
-    0% {
-        transform: translate(0, 0) scale(1);
+html[data-theme="gk-style"] #stars2 {
+    width: 2px;
+    height: 2px;
+    background: transparent;
+    box-shadow: $shadows-medium;
+    animation: animStar 100s linear infinite;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -2;
+
+    &:after {
+        content: " ";
+        position: absolute;
+        top: 2000px;
+        width: 2px;
+        height: 2px;
+        background: transparent;
+        box-shadow: $shadows-medium;
+    }
+}
+
+html[data-theme="gk-style"] #stars3 {
+    width: 3px;
+    height: 3px;
+    background: transparent;
+    box-shadow: $shadows-big;
+    animation: animStar 150s linear infinite;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+    &:after {
+        content: " ";
+        position: absolute;
+        top: 2000px;
+        width: 3px;
+        height: 3px;
+        background: transparent;
+        box-shadow: $shadows-big;
+    }
+}
+
+@keyframes animStar {
+    from {
+        transform: translateY(0px);
     }
 
-    100% {
-        transform: translate(-2%, -2%) scale(1.05);
+    to {
+        transform: translateY(-2000px);
     }
 }
 
@@ -70,11 +134,12 @@ html[data-theme="gk-style"] .page__content {
     padding: 40px;
     background: rgba(0, 0, 0, 0.3);
     /* Glassmorphism effect */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
 html[data-theme="gk-style"] a {
