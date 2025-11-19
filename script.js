@@ -1619,58 +1619,19 @@ function initModal() {
             collaborators: ['Prof. Javier Duarte', 'CMS Collaboration']
         },
         kcwi: {
-            title: 'KCWI Data Reduction',
+            title: 'KCWI/KCRM Reduction',
             advisor: 'Prof. Alison Coil',
             description: `
-                <p style="margin-bottom: 2rem;">The Keck Cosmic Web Imager (KCWI) is an integral field spectrograph that captures 3D data cubes containing spatial and spectral information. Processing this data requires careful calibration, sky subtraction, and mosaicking to produce science-ready spectroscopic cubes.</p>
+                <p style="margin-bottom: 2rem;">Complete documentation for reducing KCWI (Keck Cosmic Web Imager) and KCRM integral field spectroscopy data, including flux calibration, sky subtraction, and mosaicking workflows.</p>
                 
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Data Reduction Workflow</h3>
+                <div style="margin-bottom: 1rem;">
+                    <a href="kcwi-reduction.pdf" class="btn btn-primary" download style="display: inline-block; margin-right: 1rem;">Download PDF</a>
+                    <a href="kcwi-reduction.pdf" class="btn btn-secondary" target="_blank" style="display: inline-block;">View in New Tab</a>
+                </div>
                 
-                <h4 style="margin-top: 1.5rem; color: #60a5fa;">1. Initial Processing with KCWI DRP</h4>
-                <p>The KCWI Data Reduction Pipeline (DRP) performs:</p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-                    <li>Bias and dark subtraction</li>
-                    <li>Flat field correction using internal arc lamps</li>
-                    <li>Wavelength calibration from arc lamp exposures</li>
-                    <li>Geometric rectification and cube construction</li>
-                </ul>
-                
-                <h4 style="margin-top: 1.5rem; color: #60a5fa;">2. Flux Calibration with KSkyWizard</h4>
-                <p>Using standard star observations to calibrate the sensitivity function:</p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-                    <li>Load the <code>*_invsens</code> file from DRP output</li>
-                    <li>Interactively refine the sensitivity curve by excluding/including regions</li>
-                    <li>Add or delete spline knots to improve the fit</li>
-                    <li>Generate telluric correction model for atmospheric absorption</li>
-                </ul>
-                
-                <h4 style="margin-top: 1.5rem; color: #60a5fa;">3. Sky Subtraction with ZAP</h4>
-                <p>The Zurich Atmosphere Purge (ZAP) algorithm removes sky emission:</p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-                    <li>Mask science targets to use in-field sky</li>
-                    <li>Apply principal component analysis to model sky lines</li>
-                    <li>Use multiple sky segments for optimal subtraction</li>
-                    <li>Special handling near strong emission lines (e.g., Hα)</li>
-                </ul>
-                
-                <h4 style="margin-top: 1.5rem; color: #60a5fa;">4. Cube Resampling and Mosaicking</h4>
-                <p>Final steps to create science-ready data products:</p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-                    <li>Resample cubes to common spatial grid using <code>ifsr_kcrmresample</code></li>
-                    <li>Detect and record peak positions for alignment</li>
-                    <li>Apply rotation corrections if needed</li>
-                    <li>Combine multiple pointings into final mosaic with <code>ifsr_nmosaic</code></li>
-                </ul>
-                
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Key Challenges</h3>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-                    <li><strong>Sky Residuals:</strong> Balancing sky subtraction without removing science signal</li>
-                    <li><strong>Telluric Absorption:</strong> Correcting for atmospheric features, especially in red wavelengths</li>
-                    <li><strong>Flux Calibration:</strong> Achieving accurate absolute flux calibration across the full wavelength range</li>
-                    <li><strong>Spatial Alignment:</strong> Precisely aligning multiple exposures for clean mosaics</li>
-                </ul>
-                
-                <p style="margin-top: 2rem;">This reduction pipeline produces high-quality 3D spectroscopic data cubes that enable detailed studies of galaxy kinematics, emission line diagnostics, and spatially-resolved spectroscopy.</p>
+                <div style="margin-top: 2rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3);">
+                    <iframe src="kcwi-reduction.pdf" width="100%" height="800px" style="border: none;"></iframe>
+                </div>
             `,
             collaborators: ['Prof. Alison Coil', 'KCWI Team']
         }
