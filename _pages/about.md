@@ -1,23 +1,20 @@
 ---
+layout: minimal_centered
 permalink: /
-title: "Academic Pages is a ready-to-fork GitHub Pages template for academic personal websites"
-author_profile: true
+title: "Saloni Agrawal"
+author_profile: false
 redirect_from: 
   - /about/
   - /about.html
 ---
 
-This is the personal website of Saloni Agrawal.
+Hi, I'm **Saloni Agrawal**.
 
-I am an Undergraduate Researcher at the University of California, San Diego (UCSD), majoring in Physics with a specialization in Astrophysics and minoring in Mathematics and Computer Science.
+I'm an undergraduate researcher at **UCSD**, studying **Physics (Astrophysics)**, **Math**, and **CS**.
 
-My research focuses on:
-*   **Active Galactic Nuclei (AGN)**: Studying outflows using KCWI spectroscopy with Dr. Alison Coil.
-*   **Globular Cluster Dynamics**: Investigating binary mass fractions and black hole retention using CMC-COSMIC simulations with Dr. Kyle Kremer.
-*   **Dark Matter Detection**: Characterizing backgrounds in the XENONnT detector with Dr. Kaixuan Ni.
-*   **Machine Learning**: Applying ML to particle physics (JetNet) with Dr. Javier Duarte.
+I work on **AGN outflows** with [Dr. Alison Coil](https://cass.ucsd.edu/~acoil/), **Globular Cluster dynamics** with [Dr. Kyle Kremer](https://kylekremer.github.io/), and **Dark Matter detection** with [Dr. Kaixuan Ni](https://physics.ucsd.edu/Directory/Person?name=Kaixuan%20Ni).
 
-I am passionate about using computational tools to solve complex astrophysical problems.
+I've also worked on **Machine Learning** for particle physics with [Dr. Javier Duarte](https://jduarte.physics.ucsd.edu/).
 
-Feel free to explore my [CV](/cv/) to learn more about my background and experience.
+[CV](/cv/) / [Email](mailto:saagrawal@Ucsd.edu) / [GitHub](https://github.com/saloniagrawal04)
 

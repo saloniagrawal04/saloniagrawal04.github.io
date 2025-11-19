@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="{{ site.locale | slice: 0,2 }}" class="no-js" data-theme="gk-style">
+
+<head>
+    {% include head.html %}
+    {% include head/custom.html %}
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .page__content {
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page__content">
+        {{ content }}
+    </div>
+    {% include scripts.html %}
+</body>
+
+</html>

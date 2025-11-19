@@ -1,0 +1,70 @@
+/* ==========================================================================
+   GK STYLE THEME
+   ========================================================================== */
+
+/* Color codes */
+$gk-bg: #111111;
+$gk-text: #ffffff;
+$gk-link: #58a6ff;
+$gk-link-hover: #88c0ff;
+
+/* GK Style theme for the site */
+html[data-theme="gk-style"] {
+    --global-base-color : #{$gk-bg};
+    --global-bg-color : #{$gk-bg};
+    --global-footer-bg-color : #{$gk-bg};
+    --global-border-color: #333333;
+    --global-text-color : #{$gk-text};
+    --global-link-color : #{$gk-link};
+    --global-link-color-hover : #{$gk-link-hover};
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+html[data-theme="gk-style"] body {
+    background-color: var(--global-bg-color);
+    color: var(--global-text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    text-align: left;
+    /* Keep text left-aligned within the centered container */
+}
+
+html[data-theme="gk-style"] .page__content {
+    max-width: 600px;
+    padding: 20px;
+    background: transparent;
+    box-shadow: none;
+}
+
+html[data-theme="gk-style"] a {
+    color: var(--global-link-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+html[data-theme="gk-style"] a:hover {
+    text-decoration: underline;
+}
+
+/* Hide standard elements for this minimal theme */
+html[data-theme="gk-style"] .masthead,
+html[data-theme="gk-style"] .sidebar,
+html[data-theme="gk-style"] .page__footer,
+html[data-theme="gk-style"] .page__meta,
+html[data-theme="gk-style"] .page__share {
+    display: none !important;
+}
+
+html[data-theme="gk-style"] h1,
+html[data-theme="gk-style"] h2,
+html[data-theme="gk-style"] h3 {
+    color: #fff;
+    font-weight: 700;
+    margin-top: 0;
+}
