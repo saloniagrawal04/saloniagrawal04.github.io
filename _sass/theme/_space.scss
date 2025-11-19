@@ -1,0 +1,61 @@
+/* ==========================================================================
+   SPACE THEME
+   ========================================================================== */
+
+/* Color codes used for the theme */
+$space-black: #0b0d17;
+$space-blue: #1b2735;
+$star-white: #ffffff;
+$nebula-purple: #6f42c1;
+$starlight-blue: #89cff0;
+
+/* Space theme for the site */
+html[data-theme="space"] {
+    --global-base-color                 : #{$space-black};
+    --global-bg-color                   : #{$space-black};
+    --global-footer-bg-color            : #{$space-blue};
+    --global-border-color               : #{$nebula-purple};
+    --global-dark-border-color          : #{$starlight-blue};
+    --global-code-background-color      : #151515;
+    --global-code-text-color            : #e6e6e6;
+    --global-fig-caption-color          : #{$starlight-blue};
+    --global-link-color                 : #{$starlight-blue};
+    --global-link-color-hover           : #{$nebula-purple};
+    --global-link-color-visited         : #da70d6;
+    --global-masthead-link-color        : #{$star-white};
+    --global-masthead-link-color-hover  : #{$starlight-blue};
+    --global-text-color                 : #{$star-white};
+    --global-text-color-light           : #b0b0b0;
+    --global-thead-color                : #{$space-blue};
+
+    /* Background Image */
+    background-image: url('/assets/images/space_background.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Ensure content containers are semi-transparent or readable against the background */
+html[data-theme="space"] body {
+    background-color: transparent;
+}
+
+html[data-theme="space"] .page__content {
+    background-color: rgba(11, 13, 23, 0.85); /* Semi-transparent dark background for readability */
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(111, 66, 193, 0.3); /* Subtle purple glow */
+}
+
+html[data-theme="space"] .archive {
+    background-color: rgba(11, 13, 23, 0.85);
+    padding: 2em;
+    border-radius: 8px;
+}
+
+html[data-theme="space"] .sidebar {
+    background-color: rgba(27, 39, 53, 0.9);
+    padding: 1em;
+    border-radius: 8px;
+}
