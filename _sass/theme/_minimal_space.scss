@@ -1,0 +1,93 @@
+/* ==========================================================================
+   MINIMAL SPACE THEME
+   ========================================================================== */
+
+/* Color codes used for the theme */
+$space-black: #050505;
+$space-dark-blue: #0a0e17;
+$star-white: #f0f0f0;
+$nebula-accent: #8a2be2;
+/* BlueViolet */
+$starlight-blue: #a0c4ff;
+$text-gray: #cccccc;
+
+/* Minimal Space theme for the site */
+html[data-theme="minimal-space"] {
+    --global-base-color : #{$space-black};
+    --global-bg-color : #{$space-dark-blue};
+    --global-footer-bg-color: #000000;
+    --global-border-color: #333333;
+    --global-dark-border-color: #555555;
+    --global-code-background-color: #111111;
+    --global-code-text-color: #e6e6e6;
+    --global-fig-caption-color : #{$text-gray};
+    --global-link-color : #{$starlight-blue};
+    --global-link-color-hover : #{$nebula-accent};
+    --global-link-color-visited: #b19cd9;
+    --global-masthead-link-color : #{$star-white};
+    --global-masthead-link-color-hover : #{$starlight-blue};
+    --global-text-color : #{$star-white};
+    --global-text-color-light : #{$text-gray};
+    --global-thead-color: #1a1a1a;
+
+    /* Typography overrides for cleaner look */
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Minimalist Layout Overrides */
+html[data-theme="minimal-space"] body {
+    background-color: var(--global-bg-color);
+    background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0e17 100%);
+    background-attachment: fixed;
+}
+
+/* Remove heavy container backgrounds for a cleaner look */
+html[data-theme="minimal-space"] .page__content {
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+html[data-theme="minimal-space"] .archive {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+/* Sidebar Styling - Cleaner */
+html[data-theme="minimal-space"] .sidebar {
+    background-color: transparent;
+    border-right: 1px solid var(--global-border-color);
+    padding-right: 2em;
+}
+
+html[data-theme="minimal-space"] .author__avatar img {
+    border: 2px solid var(--global-link-color);
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+}
+
+/* Headings */
+html[data-theme="minimal-space"] h1,
+html[data-theme="minimal-space"] h2,
+html[data-theme="minimal-space"] h3 {
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+}
+
+html[data-theme="minimal-space"] .page__title {
+    border-bottom: 1px solid var(--global-link-color);
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    display: inline-block;
+}
+
+/* Links */
+html[data-theme="minimal-space"] a {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+html[data-theme="minimal-space"] a:hover {
+    text-decoration: none;
+    color: var(--global-link-color-hover);
+}

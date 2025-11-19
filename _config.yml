@@ -8,7 +8,7 @@
 
 # Basic Site Settings
 locale                   : "en-US"
-site_theme               : "space"
+site_theme               : "minimal-space"
 title                    : "Saloni Agrawal"
 title_separator          : "-"
 name                     : &name "Saloni Agrawal"
