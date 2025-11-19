@@ -1,96 +1,200 @@
-# Academic Pages
-**Academic Pages is a GitHub Pages template for personal and professional portfolio-oriented websites.**
+# Saloni Agrawal - Academic Website
 
-![Academic Pages template example](images/homepage.png "Academic Pages template example")
+A clean, minimal, professional academic website featuring a subtle black hole + galaxy background simulation.
 
-# Getting Started
+## 🚀 Quick Start
 
-1. Register a GitHub account if you don't have one and confirm your e-mail (required!)
-1. Click the "Use this template" button in the top right.
-1. On the "New repository" page, enter your public repository name as "[your GitHub username].github.io", which will also be your website's URL.
-1. Set site-wide configuration and add your content.
-1. Upload any files (like PDFs, .zip files, etc.) to the `files/` directory. They will appear at https://[your GitHub username].github.io/files/example.pdf.
-1. Check status by going to the repository settings, in the "GitHub pages" section
-1. (Optional) Use the Jupyter notebooks or python scripts in the `markdown_generator` folder to generate markdown files for publications and talks from a TSV file.
+1. **Local Testing**: Simply open `index.html` in your browser
+2. **GitHub Pages Deployment**: 
+   - Create a new repository named `<your-username>.github.io`
+   - Upload all files to the repository
+   - Enable GitHub Pages in Settings → Pages → Source: main branch
+   - Your site will be live at `https://<your-username>.github.io`
 
-See more info at https://academicpages.github.io/
+## 📁 File Structure
 
-## Running locally
-
-When you are initially working on your website, it is very useful to be able to preview the changes locally before pushing them to GitHub. To work locally you will need to:
-
-1. Clone the repository and made updates as detailed above.
-
-### Using a different IDE
-1. Make sure you have ruby-dev, bundler, and nodejs installed
-    
-    On most Linux distribution and [Windows Subsystem Linux](https://learn.microsoft.com/en-us/windows/wsl/about) the command is:
-    ```bash
-    sudo apt install ruby-dev ruby-bundler nodejs
-    ```
-    If you see error `Unable to locate package ruby-bundler`, `Unable to locate package nodejs `, run the following:
-    ```bash
-    sudo apt update && sudo apt upgrade -y
-    ```
-    then try run `sudo apt install ruby-dev ruby-bundler nodejs` again.
-
-    On MacOS the commands are:
-    ```bash
-    brew install ruby
-    brew install node
-    gem install bundler
-    ```
-1. Run `bundle install` to install ruby dependencies. If you get errors, delete Gemfile.lock and try again.
-
-    If you see file permission error like `Fetching bundler-2.6.3.gem ERROR:  While executing gem (Gem::FilePermissionError) You don't have write permissions for the /var/lib/gems/3.2.0 directory.` or `Bundler::PermissionError: There was an error while trying to write to /usr/local/bin.`
-    Install Gems Locally (Recommended):
-    ```bash
-    bundle config set --local path 'vendor/bundle'
-    ```
-    then try run `bundle install` again. If succeeded, you should see a folder called `vendor` and `.bundle`.
-
-1. Run `jekyll serve -l -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change.
-    You may also try `bundle exec jekyll serve -l -H localhost` to ensure jekyll to use specific dependencies on your own local machine.
-
-If you are running on Linux it may be necessary to install some additional dependencies prior to being able to run locally: `sudo apt install build-essential gcc make`
-
-## Using Docker
-
-Working from a different OS, or just want to avoid installing dependencies? You can use the provided `Dockerfile` to build a container that will run the site for you if you have [Docker](https://www.docker.com/) installed.
-
-You can build and execute the container by running the following command in the repository:
-
-```bash
-chmod -R 777 .
-docker compose up
+```
+saloni-academic-site/
+├── index.html          # Main website file
+├── styles.css          # All styling
+├── script.js           # Background simulation + interactions
+├── cv.pdf              # Your CV (replace with your own)
+├── blog/               # Blog posts directory
+│   └── (add your posts here)
+└── README.md           # This file
 ```
 
-You should now be able to access the website from `localhost:4000`.
+## ✏️ How to Edit Content
 
-### Using the DevContainer in VS Code
+### Update Personal Information
 
-If you are using [Visual Studio Code](https://code.visualstudio.com/) you can use the [Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) that comes with this Repository. Normally VS Code detects that a development coontainer configuration is available and asks you if you want to use the container. If this doesn't happen you can manually start the container by **F1->DevContainer: Reopen in Container**. This restarts your VS Code in the container and automatically hosts your academic page locally on http://localhost:4000. All changes will be updated live to that page after a few seconds.
+**In `index.html`:**
 
-# Maintenance
+1. **Name & Tagline** (lines 35-37):
+   ```html
+   <h1 class="hero-title">Your Name</h1>
+   <p class="hero-tagline">Your Research Areas</p>
+   ```
 
-Bug reports and feature requests to the template should be [submitted via GitHub](https://github.com/academicpages/academicpages.github.io/issues/new/choose). For questions concerning how to style the template, please feel free to start a [new discussion on GitHub](https://github.com/academicpages/academicpages.github.io/discussions).
+2. **Bio** (lines 38-43):
+   Edit the paragraph in the `.hero-intro` section
 
-This repository was forked (then detached) by [Stuart Geiger](https://github.com/staeiou) from the [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/), which is © 2016 Michael Rose and released under the MIT License (see LICENSE.md). It is currently being maintained by [Robert Zupko](https://github.com/rjzupkoii) and additional maintainers would be welcomed.
+3. **Contact Links** (lines 45-49):
+   Update email and GitHub URLs
 
-## Bugfixes and enhancements
+### Add/Edit Research Projects
 
-If you have bugfixes and enhancements that you would like to submit as a pull request, you will need to [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) this repository as opposed to using it as a template. This will also allow you to [synchronize your copy](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) of template to your fork as well.
+**In `index.html`** (lines 60-100):
+- Each research card has a `data-research` attribute
+- Edit the title, summary, and advisor name
 
-Unfortunately, one logistical issue with a template theme like Academic Pages that makes it a little tricky to get bug fixes and updates to the core theme. If you use this template and customize it, you will probably get merge conflicts if you attempt to synchronize. If you want to save your various .yml configuration files and markdown files, you can delete the repository and fork it again. Or you can manually patch.
+**In `script.js`** (lines 350-450):
+- Update the `researchDetails` object with full project descriptions
+- Add new projects by adding entries to this object
+
+### Update CV
+
+1. Replace `cv.pdf` with your own PDF file
+2. Keep the same filename, or update the links in `index.html` (lines 110-111)
+
+### Edit Education Timeline
+
+**In `index.html`** (lines 125-155):
+- Each `.timeline-item` represents an entry
+- Add more items by copying the structure
+- Update dates, degrees, and coursework
+
+### Add Blog Posts
+
+1. Create a new HTML file in the `blog/` directory
+2. Add a new blog card in `index.html` (lines 170-210)
+3. Update the date, title, tag, and excerpt
+4. Link to your new blog post file
+
+## 🎨 Customization
+
+### Change Colors
+
+**In `styles.css`** (lines 8-17), edit the CSS variables:
+```css
+:root {
+    --bg-primary: #0a0e1a;        /* Main background */
+    --accent-primary: #60a5fa;     /* Primary accent color */
+    --accent-secondary: #818cf8;   /* Secondary accent */
+    /* ... more variables */
+}
+```
+
+### Adjust Background Simulation
+
+**In `script.js`** (lines 60-80):
+- `numParticles`: Number of particles in accretion disk (default: 150)
+- `numStars`: Number of background stars (default: 50)
+- `blackHole.mass`: Gravitational strength (default: 1000)
+
+To make the simulation more/less visible, edit `opacity` in `styles.css` line 42:
+```css
+#bg-simulation {
+    opacity: 0.15;  /* Adjust between 0.1 - 0.3 */
+}
+```
+
+### Change Fonts
+
+**In `styles.css`** (line 20), replace the Google Fonts import:
+```css
+@import url('https://fonts.googleapis.com/css2?family=YourFont&display=swap');
+```
+
+Then update the font variables (lines 13-15).
+
+## 📝 Adding Blog Posts
+
+### Create a Blog Post Template
+
+Create `blog/your-post.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Post Title - Saloni Agrawal</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .blog-post {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 2rem;
+        }
+        .blog-post h1 {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .blog-post p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="blog-post">
+        <a href="../index.html#blog" style="color: var(--accent-primary);">← Back to Blog</a>
+        <h1>Your Post Title</h1>
+        <p class="blog-date">Date</p>
+        
+        <p>Your content here...</p>
+        
+        <!-- Add more content -->
+    </div>
+</body>
+</html>
+```
+
+## 🔧 Technical Details
+
+- **Pure HTML/CSS/JS**: No build process required
+- **Responsive Design**: Works on mobile, tablet, and desktop
+- **Performance**: Lightweight, fast loading
+- **Browser Support**: Modern browsers (Chrome, Firefox, Safari, Edge)
+
+## 📊 Background Simulation Details
+
+The homepage features a subtle black hole + accretion disk simulation:
+- **Particles**: Orbit the central black hole with realistic gravitational physics
+- **Stars**: Twinkling background stars
+- **AGN Jets**: Subtle outflow lines from the black hole
+- **Opacity**: Set to 15% to remain non-distracting
+
+The simulation uses HTML5 Canvas and requestAnimationFrame for smooth 60fps animation.
+
+## 🎯 SEO & Accessibility
+
+- Semantic HTML5 elements
+- Meta descriptions included
+- Alt text for images (add your own images)
+- ARIA labels where needed
+- Proper heading hierarchy
+
+## 📱 Responsive Breakpoints
+
+- Desktop: > 768px
+- Tablet/Mobile: ≤ 768px
+
+## 🤝 Need Help?
+
+If you need to make changes and get stuck:
+1. Check the comments in each file (marked with `<!-- -->` in HTML, `/* */` in CSS/JS)
+2. Use browser DevTools (F12) to inspect elements
+3. Test changes locally before deploying
+
+## 📄 License
+
+Feel free to use this template for your own academic website!
 
 ---
-<div align="center">
-    
-![pages-build-deployment](https://github.com/academicpages/academicpages.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
-[![GitHub contributors](https://img.shields.io/github/contributors/academicpages/academicpages.github.io.svg)](https://github.com/academicpages/academicpages.github.io/graphs/contributors)
-[![GitHub release](https://img.shields.io/github/v/release/academicpages/academicpages.github.io)](https://github.com/academicpages/academicpages.github.io/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/academicpages/academicpages.github.io?color=blue)](https://github.com/academicpages/academicpages.github.io/blob/master/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/academicpages/academicpages.github.io)](https://github.com/academicpages/academicpages.github.io)
-[![GitHub forks](https://img.shields.io/github/forks/academicpages/academicpages.github.io)](https://github.com/academicpages/academicpages.github.io/fork)
-</div>
+**Built with:** HTML5, CSS3, JavaScript (Canvas API)  
+**Inspired by:** NASA graphics, Caltech astrophysics pages, minimal portfolio design

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saloni Agrawal - Computational Astrophysicist</title>
+    <meta name="description"
+        content="Saloni Agrawal - Computational Astrophysics researcher at UCSD specializing in AGN Outflows and Galaxy Evolution">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">SA</a>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#research" class="nav-link">Research</a></li>
+                <li><a href="#cv" class="nav-link">CV</a></li>
+                <li><a href="#education" class="nav-link">Education</a></li>
+                <li><a href="#blog" class="nav-link">Blog</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Background Simulation Canvas -->
+    <canvas id="bg-simulation"></canvas>
+
+    <!-- Home Section -->
+    <section id="home" class="section hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Saloni Agrawal</h1>
+                <p class="hero-tagline">Computational Astrophysics • AGN Outflows • Galaxy Evolution</p>
+                <p class="hero-intro">
+                    I'm an undergraduate researcher at UC San Diego studying the dynamic interplay between
+                    supermassive black holes and their host galaxies. My work combines observational data
+                    analysis, numerical simulations, and machine learning to understand how AGN feedback
+                    shapes galaxy evolution.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#research" class="btn btn-primary">Research</a>
+                    <a href="#cv" class="btn btn-secondary">CV</a>
+                    <a href="mailto:saagrawal@ucsd.edu" class="btn btn-secondary">Email</a>
+                    <a href="https://github.com/saloniagrawal04" class="btn btn-secondary" target="_blank">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Section -->
+    <section id="research" class="section">
+        <div class="container">
+            <h2 class="section-title">Research</h2>
+            <div class="research-grid">
+                <!-- Research Card 1: AGN Outflows -->
+                <div class="research-card" data-research="agn">
+                    <div class="card-animation" id="agn-animation"></div>
+                    <h3 class="card-title">AGN Outflows</h3>
+                    <p class="card-summary">
+                        Analyzing galactic-scale winds driven by supermassive black holes using KCWI spectroscopy
+                        to understand AGN feedback mechanisms.
+                    </p>
+                    <p class="card-advisor">with Prof. Alison Coil</p>
+                </div>
+
+                <!-- Research Card 2: Globular Clusters -->
+                <div class="research-card" data-research="gc">
+                    <div class="card-animation" id="gc-animation"></div>
+                    <h3 class="card-title">Globular Cluster Dynamics</h3>
+                    <p class="card-summary">
+                        Simulating N-body dynamics in dense stellar environments to study black hole retention
+                        and binary evolution in globular clusters.
+                    </p>
+                    <p class="card-advisor">with Prof. Kyle Kremer</p>
+                </div>
+
+                <!-- Research Card 3: Dark Matter -->
+                <div class="research-card" data-research="dm">
+                    <div class="card-animation" id="dm-animation"></div>
+                    <h3 class="card-title">Dark Matter Detection</h3>
+                    <p class="card-summary">
+                        Characterizing backgrounds in the XENONnT detector to improve sensitivity
+                        for WIMP dark matter searches.
+                    </p>
+                    <p class="card-advisor">with Prof. Kaixuan Ni</p>
+                </div>
+
+                <!-- Research Card 4: Machine Learning -->
+                <div class="research-card" data-research="ml">
+                    <div class="card-animation" id="ml-animation"></div>
+                    <h3 class="card-title">ML for Particle Physics</h3>
+                    <p class="card-summary">
+                        Developing machine learning models for jet classification and particle identification
+                        in high-energy physics experiments.
+                    </p>
+                    <p class="card-advisor">with Prof. Javier Duarte</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CV Section -->
+    <section id="cv" class="section">
+        <div class="container">
+            <h2 class="section-title">Curriculum Vitae</h2>
+            <div class="cv-container">
+                <div class="cv-buttons">
+                    <a href="cv.pdf" class="btn btn-primary" download>Download CV</a>
+                    <a href="cv.pdf" class="btn btn-secondary" target="_blank">View in New Tab</a>
+                </div>
+                <div class="cv-embed">
+                    <iframe src="cv.pdf" width="100%" height="800px"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="section">
+        <div class="container">
+            <h2 class="section-title">Education</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>University of California, San Diego</h3>
+                        <p class="timeline-date">2022 - Present</p>
+                        <p class="timeline-degree">B.S. Physics (Astrophysics) | Minor: Mathematics, Computer Science
+                        </p>
+                        <p class="timeline-details">
+                            <strong>Relevant Coursework:</strong> Computational Physics, Stellar Astrophysics,
+                            Galactic & Extragalactic Astronomy, Quantum Mechanics, Statistical Mechanics,
+                            Machine Learning, Data Structures & Algorithms
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>Research Experience</h3>
+                        <p class="timeline-date">2023 - Present</p>
+                        <p class="timeline-degree">Undergraduate Research Assistant</p>
+                        <ul class="timeline-list">
+                            <li>AGN Outflows Research (Prof. Alison Coil)</li>
+                            <li>Globular Cluster Dynamics (Prof. Kyle Kremer)</li>
+                            <li>Dark Matter Detection (Prof. Kaixuan Ni)</li>
+                            <li>ML for Particle Physics (Prof. Javier Duarte)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="section">
+        <div class="container">
+            <h2 class="section-title">Blog</h2>
+            <div class="blog-grid">
+                <!-- Blog Post 1 -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">November 2024</span>
+                        <span class="blog-tag tag-astrophysics">Astrophysics</span>
+                    </div>
+                    <h3 class="blog-title">Understanding AGN Feedback in Galaxy Evolution</h3>
+                    <p class="blog-excerpt">
+                        How do supermassive black holes regulate star formation across cosmic time?
+                        A deep dive into the physics of AGN-driven outflows...
+                    </p>
+                    <a href="blog/agn-feedback.html" class="blog-link">Read more →</a>
+                </article>
+
+                <!-- Blog Post 2 -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">October 2024</span>
+                        <span class="blog-tag tag-coding">Coding</span>
+                    </div>
+                    <h3 class="blog-title">Building N-Body Simulations from Scratch</h3>
+                    <p class="blog-excerpt">
+                        A tutorial on implementing gravitational N-body codes using Python and understanding
+                        the computational challenges of stellar dynamics...
+                    </p>
+                    <a href="blog/nbody-tutorial.html" class="blog-link">Read more →</a>
+                </article>
+
+                <!-- Blog Post 3 -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">September 2024</span>
+                        <span class="blog-tag tag-education">Education</span>
+                    </div>
+                    <h3 class="blog-title">Teaching Physics Through Computational Thinking</h3>
+                    <p class="blog-excerpt">
+                        Reflections on my experience teaching computational methods to high school students
+                        and why coding belongs in physics education...
+                    </p>
+                    <a href="blog/teaching-physics.html" class="blog-link">Read more →</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        Beyond the equations and simulations, I'm passionate about making astrophysics
+                        accessible and inspiring the next generation of scientists. When I'm not analyzing
+                        spectroscopic data or debugging simulation code, you'll find me:
+                    </p>
+                    <ul class="about-list">
+                        <li>📚 Reading science fiction and popular science books</li>
+                        <li>🍳 Experimenting with new recipes (computational chemistry in the kitchen!)</li>
+                        <li>🎓 Teaching and mentoring through STEM outreach programs</li>
+                        <li>🌌 Stargazing and astrophotography</li>
+                        <li>💻 Contributing to open-source scientific software</li>
+                    </ul>
+                    <p>
+                        I believe that the universe's greatest mysteries deserve to be explored with both
+                        rigorous scientific methods and creative computational approaches. My goal is to
+                        contribute to our understanding of how galaxies evolve while developing tools and
+                        techniques that make astrophysics research more accessible.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Saloni Agrawal. Built with curiosity and code.</p>
+            <p>
+                <a href="mailto:saagrawal@ucsd.edu">Email</a> •
+                <a href="https://github.com/saloniagrawal04" target="_blank">GitHub</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Research Modal -->
+    <div id="research-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
