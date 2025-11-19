@@ -1,0 +1,109 @@
+/* ==========================================================================
+   LAB NOTEBOOK THEME
+   ========================================================================== */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap');
+
+/* Color Palette */
+$paper-white: #FAF7F2;
+$graphite-black: #1B1B1B;
+$sky-highlight: #8BB7F0;
+$coral-soft: #FF857C;
+$navy-deep: #14213D;
+$line-blue: rgba(139, 183, 240, 0.3);
+/* For lined paper */
+
+/* Theme Variables */
+html[data-theme="lab-notebook"] {
+    --global-base-color: #{$graphite-black};
+    --global-bg-color: #{$paper-white};
+    --global-text-color: #{$graphite-black};
+    --global-link-color: #{$navy-deep};
+    --global-link-color-hover: #{$coral-soft};
+    --global-border-color: #{$graphite-black};
+    --global-code-font: 'JetBrains Mono', monospace;
+    --global-heading-font: 'Patrick Hand', cursive;
+    --global-body-font: 'Inter', sans-serif;
+
+    --paper-color: #{$paper-white};
+    --ink-color: #{$graphite-black};
+    --highlight-blue: #{$sky-highlight};
+    --highlight-coral: #{$coral-soft};
+}
+
+html[data-theme="lab-notebook"] body {
+    background-color: var(--global-bg-color);
+    color: var(--global-text-color);
+    font-family: var(--global-body-font);
+    margin: 0;
+    overflow-x: hidden;
+    /* Subtle paper texture */
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* Typography */
+html[data-theme="lab-notebook"] h1,
+html[data-theme="lab-notebook"] h2,
+html[data-theme="lab-notebook"] h3,
+html[data-theme="lab-notebook"] h4 {
+    font-family: var(--global-heading-font);
+    font-weight: 400;
+    /* Handwritten fonts usually don't need bold */
+    color: var(--global-text-color);
+}
+
+html[data-theme="lab-notebook"] code,
+html[data-theme="lab-notebook"] pre {
+    font-family: var(--global-code-font);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: $navy-deep;
+}
+
+/* Lined Paper Effect */
+html[data-theme="lab-notebook"] .lined-paper {
+    background-color: $paper-white;
+    background-image: linear-gradient($line-blue 1px, transparent 1px);
+    background-size: 100% 1.5rem;
+    /* Line height */
+    line-height: 1.5rem;
+    padding: 2rem;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Hand-drawn Border Utility */
+html[data-theme="lab-notebook"] .hand-drawn-border {
+    border: 2px solid $graphite-black;
+    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+    /* Sketchy border radius */
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sticky Note */
+html[data-theme="lab-notebook"] .sticky-note {
+    background-color: #FFF7D1;
+    /* Classic yellow sticky */
+    padding: 1.5rem;
+    font-family: var(--global-heading-font);
+    font-size: 1.2rem;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.2);
+    transform: rotate(-2deg);
+    transition: transform 0.2s ease;
+}
+
+html[data-theme="lab-notebook"] .sticky-note:hover {
+    transform: rotate(0deg) scale(1.05);
+    z-index: 10;
+}
+
+/* Hide standard elements */
+html[data-theme="lab-notebook"] .masthead,
+html[data-theme="lab-notebook"] .sidebar,
+html[data-theme="lab-notebook"] .page__footer,
+html[data-theme="lab-notebook"] .page__meta,
+html[data-theme="lab-notebook"] .page__share {
+    display: none !important;
+}

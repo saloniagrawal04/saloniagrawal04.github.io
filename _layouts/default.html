@@ -8,7 +8,7 @@ layout: compress
 <html lang="{{ site.locale | slice: 0,2 }}" class="no-js" {% if site.site_theme=="dark" %} data-theme="dark" {% elsif
   site.site_theme=="space" %} data-theme="space" {% elsif site.site_theme=="minimal-space" %} data-theme="minimal-space"
   {% elsif site.site_theme=="gk-style" %} data-theme="gk-style" {% elsif site.site_theme=="interactive-playground" %}
-  data-theme="interactive-playground" {% endif %}>
+  data-theme="interactive-playground" {% elsif site.site_theme=="lab-notebook" %} data-theme="lab-notebook" {% endif %}>
 
 <head>
   {% include head.html %}

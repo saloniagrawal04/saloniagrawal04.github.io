@@ -8,7 +8,7 @@
 
 # Basic Site Settings
 locale                   : "en-US"
-site_theme               : "interactive-playground"
+site_theme               : "lab-notebook"
 title                    : "Saloni Agrawal"
 title_separator          : "-"
 name                     : &name "Saloni Agrawal"
