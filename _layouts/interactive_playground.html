@@ -39,23 +39,31 @@
 
         .hero-content {
             pointer-events: auto;
-            background: rgba(17, 17, 17, 0.7);
+            background: rgba(250, 245, 239, 0.8);
+            /* Cream paper with opacity */
             padding: 40px;
-            border: 1px solid #343434;
+            border: 2px solid #1C1C1C;
+            /* Ink Black border */
             backdrop-filter: blur(5px);
+            box-shadow: 10px 10px 0px rgba(232, 196, 120, 0.5);
+            /* Warm gold shadow block */
         }
 
         .hero-title {
             font-size: 4rem;
             margin-bottom: 0.5rem;
-            text-shadow: 0 0 20px rgba(0, 209, 255, 0.5);
+            color: #1C1C1C;
+            /* Removed neon glow, added solid shadow for retro-future feel */
+            text-shadow: 2px 2px 0px #9BBDF9;
         }
 
         .hero-subtitle {
             font-family: 'Fira Code', monospace;
-            color: #00D1FF;
+            color: #FF7F6A;
+            /* Coral */
             font-size: 1.5rem;
             margin-bottom: 2rem;
+            font-weight: 600;
         }
 
         .research-section {
@@ -67,7 +75,10 @@
             font-size: 2.5rem;
             margin-bottom: 50px;
             text-align: center;
-            color: #FF1E99;
+            color: #1C1C1C;
+            text-decoration: underline;
+            text-decoration-color: #E8C478;
+            text-decoration-thickness: 5px;
         }
 
         .cards-container {
@@ -77,26 +88,28 @@
         }
 
         .research-card {
-            background: rgba(17, 17, 17, 0.8);
-            border: 1px solid #343434;
+            background: #FAF5EF;
+            border: 2px solid #1C1C1C;
             padding: 20px;
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 400px;
             display: flex;
             flex-direction: column;
         }
 
         .research-card:hover {
-            transform: translateY(-10px);
-            border-color: #00D1FF;
-            box-shadow: 0 0 20px rgba(0, 209, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 8px 8px 0px #9BBDF9;
+            /* Sky blue block shadow */
         }
 
         .card-visual {
             flex-grow: 1;
-            background: #000;
+            background: #fff;
+            /* White background for visuals */
+            border: 1px solid #1C1C1C;
             margin-bottom: 20px;
             position: relative;
             display: flex;
@@ -108,12 +121,13 @@
         .card-title {
             font-size: 1.5rem;
             margin-bottom: 10px;
-            color: #FFFFFF;
+            color: #1C1C1C;
+            font-weight: 700;
         }
 
         .card-desc {
             font-size: 1rem;
-            color: #CCCCCC;
+            color: #333;
             font-family: 'Inter', sans-serif;
         }
 
@@ -123,14 +137,16 @@
             height: 0;
             border-left: 50px solid transparent;
             border-right: 50px solid transparent;
-            border-top: 100px solid rgba(0, 209, 255, 0.5);
+            border-top: 100px solid rgba(155, 189, 249, 0.8);
+            /* Sky Blue */
             animation: spin 4s linear infinite;
             transform-style: preserve-3d;
         }
 
         .agn-cone.bottom {
             border-top: none;
-            border-bottom: 100px solid rgba(255, 30, 153, 0.5);
+            border-bottom: 100px solid rgba(255, 127, 106, 0.8);
+            /* Coral */
             margin-top: -20px;
         }
 
@@ -148,26 +164,27 @@
         .dm-pulse {
             width: 20px;
             height: 20px;
-            background: #FF1E99;
+            background: #1C1C1C;
+            /* Ink Black core */
             border-radius: 50%;
-            box-shadow: 0 0 20px #FF1E99;
-            animation: pulseMove 2s infinite ease-in-out;
+            box-shadow: 0 0 0 0 rgba(28, 28, 28, 0.7);
+            animation: pulseMove 2s infinite;
         }
 
         @keyframes pulseMove {
             0% {
-                transform: scale(0.5);
-                opacity: 0.5;
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(28, 28, 28, 0.7);
             }
 
-            50% {
-                transform: scale(1.5);
-                opacity: 1;
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 20px rgba(28, 28, 28, 0);
             }
 
             100% {
-                transform: scale(0.5);
-                opacity: 0.5;
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(28, 28, 28, 0);
             }
         }
 
@@ -179,7 +196,7 @@
 
         .timeline-bar {
             width: 4px;
-            background: #343434;
+            background: #1C1C1C;
             margin: 0 auto;
             position: relative;
         }
@@ -204,18 +221,20 @@
         .timeline-dot {
             width: 20px;
             height: 20px;
-            background: #00D1FF;
+            background: #E8C478;
+            /* Warm Gold */
+            border: 2px solid #1C1C1C;
             border-radius: 50%;
             position: absolute;
             top: 0;
         }
 
         .timeline-item:nth-child(odd) .timeline-dot {
-            right: -10px;
+            right: -12px;
         }
 
         .timeline-item:nth-child(even) .timeline-dot {
-            left: -10px;
+            left: -12px;
         }
     </style>
 </head>
@@ -229,7 +248,7 @@
             <div class="hero-content">
                 <h1 class="hero-title">Saloni Agrawal</h1>
                 <p class="hero-subtitle">&lt;Computational Astrophysicist /&gt;</p>
-                <p style="font-family: 'Inter'; max-width: 600px; margin: 0 auto 20px;">
+                <p style="font-family: 'Inter'; max-width: 600px; margin: 0 auto 20px; color: #1C1C1C;">
                     Simulating the universe, one line of code at a time.
                     <br>AGN Outflows | Globular Clusters | Dark Matter
                 </p>

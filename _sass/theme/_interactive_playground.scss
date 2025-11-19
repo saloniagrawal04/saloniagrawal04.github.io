@@ -1,25 +1,30 @@
 /* ==========================================================================
-   INTERACTIVE PHYSICS PLAYGROUND THEME
+   INTERACTIVE PHYSICS PLAYGROUND THEME (Warm Palette)
    ========================================================================== */
 
 /* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap');
 
 /* Color Palette */
-$charcoal: #111111;
-$laser-blue: #00D1FF;
-$neon-magenta: #FF1E99;
-$white: #FFFFFF;
-$grid-gray: #343434;
+$cream-paper: #FAF5EF;
+$deep-ink-black: #1C1C1C;
+$soft-sky-blue: #9BBDF9;
+$coral-highlight: #FF7F6A;
+$warm-gold: #E8C478;
+$grid-color: rgba(28, 28, 28, 0.1);
+/* Low opacity black for grid on cream */
 
 /* Theme Variables */
 html[data-theme="interactive-playground"] {
-    --global-base-color: #{$charcoal};
-    --global-bg-color: #{$charcoal};
-    --global-text-color: #{$white};
-    --global-link-color: #{$laser-blue};
-    --global-link-color-hover: #{$neon-magenta};
-    --global-border-color: #{$grid-gray};
+    --global-base-color: #{$deep-ink-black};
+    --global-bg-color: #{$cream-paper};
+    --global-text-color: #{$deep-ink-black};
+    --global-link-color: #{$soft-sky-blue};
+    /* Maybe too light for text? Let's check contrast. */
+    /* Sky blue on cream might be low contrast. Let's use Coral for primary links/buttons as it pops more. */
+    --global-link-color: #{$coral-highlight};
+    --global-link-color-hover: #{$soft-sky-blue};
+    --global-border-color: #{$warm-gold};
     --global-code-font: 'Fira Code', monospace;
     --global-heading-font: 'Space Grotesk', sans-serif;
     --global-body-font: 'Inter', sans-serif;
@@ -36,9 +41,8 @@ html[data-theme="interactive-playground"] body {
 /* Grid Background */
 html[data-theme="interactive-playground"] .grid-bg {
     background-size: 40px 40px;
-    background-image:
-        linear-gradient(to right, rgba(52, 52, 52, 0.5) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(52, 52, 52, 0.5) 1px, transparent 1px);
+    background-image: linear-gradient(to right, #{$grid-color} 1px, transparent 1px),
+    linear-gradient(to bottom, #{$grid-color} 1px, transparent 1px);
     position: fixed;
     top: 0;
     left: 0;
@@ -65,15 +69,17 @@ html[data-theme="interactive-playground"] h6 {
 html[data-theme="interactive-playground"] code,
 html[data-theme="interactive-playground"] pre {
     font-family: var(--global-code-font);
-    color: $laser-blue;
+    color: #{$coral-highlight};
+    /* Changed to Coral for visibility */
 }
 
 /* Buttons */
 html[data-theme="interactive-playground"] .btn-physics {
     display: inline-block;
     padding: 10px 20px;
-    border: 2px solid $laser-blue;
-    color: $laser-blue;
+    border: 2px solid $deep-ink-black;
+    /* Stronger border */
+    color: $deep-ink-black;
     font-family: var(--global-code-font);
     text-transform: uppercase;
     text-decoration: none;
@@ -82,12 +88,15 @@ html[data-theme="interactive-playground"] .btn-physics {
     transition: all 0.3s ease;
     background: transparent;
     cursor: pointer;
+    font-weight: 600;
 }
 
 html[data-theme="interactive-playground"] .btn-physics:hover {
-    background: rgba(0, 209, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
-    text-shadow: 0 0 5px $laser-blue;
+    background: rgba(255, 127, 106, 0.1);
+    /* Coral tint */
+    box-shadow: 0 0 15px rgba(255, 127, 106, 0.3);
+    border-color: $coral-highlight;
+    color: $coral-highlight;
 }
 
 html[data-theme="interactive-playground"] .btn-physics::after {
@@ -97,7 +106,8 @@ html[data-theme="interactive-playground"] .btn-physics::after {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 30, 153, 0.5);
+    background: rgba(155, 189, 249, 0.5);
+    /* Sky blue ripple */
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: width 0.6s ease, height 0.6s ease;

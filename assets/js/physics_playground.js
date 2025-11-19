@@ -33,7 +33,8 @@ function initHeroPhysics() {
             this.vx = (Math.random() - 0.5) * 2;
             this.vy = (Math.random() - 0.5) * 2;
             this.size = Math.random() * 2 + 1;
-            this.color = Math.random() > 0.5 ? '#00D1FF' : '#FF1E99';
+            // Updated colors: Soft Sky Blue and Coral Highlight
+            this.color = Math.random() > 0.5 ? '#9BBDF9' : '#FF7F6A';
         }
 
         update() {
@@ -88,7 +89,7 @@ function initHeroPhysics() {
             p.update();
             p.draw();
         });
-        
+
         // Draw connecting lines
         particles.forEach((a, index) => {
             particles.slice(index + 1).forEach(b => {
@@ -98,7 +99,8 @@ function initHeroPhysics() {
 
                 if (distance < 100) {
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`;
+                    // Updated line color: Ink Black with low opacity for subtle connections
+                    ctx.strokeStyle = `rgba(28, 28, 28, ${0.2 * (1 - distance / 100)})`;
                     ctx.lineWidth = 0.5;
                     ctx.moveTo(a.x, a.y);
                     ctx.lineTo(b.x, b.y);
@@ -124,7 +126,7 @@ function initGCPhysics() {
     canvas.height = container.clientHeight;
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');
-    
+
     const stars = [];
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
@@ -146,7 +148,8 @@ function initGCPhysics() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = '#FFFFFF';
+            // Updated star color: Ink Black for visibility on white card background
+            ctx.fillStyle = '#1C1C1C';
             ctx.fill();
         }
     }
@@ -156,9 +159,10 @@ function initGCPhysics() {
     }
 
     function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // Trail effect
+        // Clear with transparency for trail effect
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         stars.forEach(star => {
             star.update();
             star.draw();
