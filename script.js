@@ -677,28 +677,250 @@ function initModal() {
     // Research details (you can edit these)
     const researchDetails = {
         agn: {
-            title: 'AGN Outflows and Galaxy Evolution',
+            title: 'AGN Outflows',
             advisor: 'Prof. Alison Coil',
             description: `
-                <p>Active Galactic Nuclei (AGN) are among the most energetic phenomena in the universe, 
-                powered by supermassive black holes accreting matter at the centers of galaxies. My research 
-                focuses on understanding how AGN-driven outflows regulate star formation and influence the 
-                evolution of their host galaxies.</p>
+                <p style="margin-bottom: 2rem;">In active galactic nuclei (AGN), supermassive black holes launch powerful winds that reshape their host galaxies. We study these outflows using ionized-gas emission lines in galaxy spectra, which reveal the motion and energetics of gas near the black hole.</p>
                 
-                <h3>Research Objectives</h3>
-                <ul>
-                    <li>Characterize the kinematics and energetics of ionized gas outflows using KCWI spectroscopy</li>
-                    <li>Measure outflow rates and compare with theoretical predictions from simulations</li>
-                    <li>Investigate the relationship between AGN properties and outflow characteristics</li>
-                    <li>Assess the impact of AGN feedback on galaxy-scale star formation</li>
-                </ul>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Spectral Signatures: Broad vs Narrow [O III]</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
+                    <div>
+                        <canvas id="narrow-spectrum" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">No AGN — narrow line from normal ionized gas.</p>
+                    </div>
+                    <div>
+                        <canvas id="broad-spectrum" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">With AGN — broad wings from fast outflowing gas.</p>
+                    </div>
+                </div>
+                <p style="font-style: italic; color: #cbd5e1; margin-bottom: 2rem;">Broad and asymmetric emission lines indicate gas moving at hundreds to thousands of km/s, a signature of AGN-driven outflows.</p>
                 
-                <h3>Methods & Tools</h3>
-                <p>I analyze integral field spectroscopy data from the Keck Cosmic Web Imager (KCWI), 
-                using Python-based tools to map the spatial distribution and velocity structure of ionized gas. 
-                My workflow includes emission line fitting, kinematic modeling, and comparison with hydrodynamic simulations.</p>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Three-Gaussian Decomposition</h3>
+                <div style="margin-bottom: 1rem;">
+                    <canvas id="gaussian-fit" width="600" height="250" style="width: 100%; max-width: 600px; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                </div>
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem;">Decomposing the emission line into Gaussian components reveals separate gas populations with different velocities and velocity dispersions.</p>
+                
+                <p style="margin-top: 2rem;">These kinematic components help us map the structure of AGN winds and measure how they influence galaxy evolution.</p>
             `,
-            collaborators: ['Prof. Alison Coil', 'UCSD Galaxy Evolution Group']
+            collaborators: ['Prof. Alison Coil', 'UCSD Galaxy Evolution Group'],
+            initVisuals: function () {
+                // Draw narrow spectrum
+                const narrowCanvas = document.getElementById('narrow-spectrum');
+                if (narrowCanvas) {
+                    const ctx = narrowCanvas.getContext('2d');
+                    const w = narrowCanvas.width;
+                    const h = narrowCanvas.height;
+
+                    // Axes
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(40, h - 30);
+                    ctx.lineTo(w - 20, h - 30);
+                    ctx.moveTo(40, 20);
+                    ctx.lineTo(40, h - 30);
+                    ctx.stroke();
+
+                    // Labels
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '11px monospace';
+                    ctx.fillText('Wavelength', w / 2 - 30, h - 5);
+                    ctx.save();
+                    ctx.translate(15, h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText('Flux', -15, 0);
+                    ctx.restore();
+
+                    // Draw narrow Gaussian
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#60a5fa';
+                    ctx.beginPath();
+                    const centerX = w / 2;
+                    const sigma = 15;
+                    for (let x = 40; x < w - 20; x++) {
+                        const dx = x - centerX;
+                        const y = h - 30 - 100 * Math.exp(-(dx * dx) / (2 * sigma * sigma));
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Draw broad spectrum
+                const broadCanvas = document.getElementById('broad-spectrum');
+                if (broadCanvas) {
+                    const ctx = broadCanvas.getContext('2d');
+                    const w = broadCanvas.width;
+                    const h = broadCanvas.height;
+
+                    // Axes
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(40, h - 30);
+                    ctx.lineTo(w - 20, h - 30);
+                    ctx.moveTo(40, 20);
+                    ctx.lineTo(40, h - 30);
+                    ctx.stroke();
+
+                    // Labels
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '11px monospace';
+                    ctx.fillText('Wavelength', w / 2 - 30, h - 5);
+                    ctx.save();
+                    ctx.translate(15, h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText('Flux', -15, 0);
+                    ctx.restore();
+
+                    // Draw broad asymmetric profile
+                    ctx.strokeStyle = '#f87171';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#f87171';
+                    ctx.beginPath();
+                    const centerX = w / 2;
+                    for (let x = 40; x < w - 20; x++) {
+                        const dx = x - centerX;
+                        // Asymmetric profile with extended blue wing
+                        const narrow = 80 * Math.exp(-(dx * dx) / (2 * 15 * 15));
+                        const broad = 40 * Math.exp(-(dx * dx) / (2 * 40 * 40));
+                        const blueWing = dx < 0 ? 25 * Math.exp(-(dx * dx) / (2 * 60 * 60)) : 0;
+                        const y = h - 30 - (narrow + broad + blueWing);
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Draw Gaussian decomposition
+                const fitCanvas = document.getElementById('gaussian-fit');
+                if (fitCanvas) {
+                    const ctx = fitCanvas.getContext('2d');
+                    const w = fitCanvas.width;
+                    const h = fitCanvas.height;
+
+                    // Axes
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(50, h - 40);
+                    ctx.lineTo(w - 30, h - 40);
+                    ctx.moveTo(50, 20);
+                    ctx.lineTo(50, h - 40);
+                    ctx.stroke();
+
+                    // Labels
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '12px monospace';
+                    ctx.fillText('Velocity (km/s)', w / 2 - 50, h - 10);
+                    ctx.save();
+                    ctx.translate(15, h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText('Flux', -15, 0);
+                    ctx.restore();
+
+                    // Velocity tick marks
+                    ctx.font = '10px monospace';
+                    const velocities = [-1000, -500, 0, 500, 1000];
+                    velocities.forEach(v => {
+                        const x = 50 + (w - 80) * (v + 1000) / 2000;
+                        ctx.fillText(v.toString(), x - 15, h - 25);
+                    });
+
+                    const centerX = w / 2;
+
+                    // Component 1: Narrow core (green)
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#10b981';
+                    ctx.beginPath();
+                    for (let x = 50; x < w - 30; x++) {
+                        const dx = x - centerX;
+                        const y = h - 40 - 120 * Math.exp(-(dx * dx) / (2 * 20 * 20));
+                        if (x === 50) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Component 2: Intermediate (blue)
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#60a5fa';
+                    ctx.beginPath();
+                    for (let x = 50; x < w - 30; x++) {
+                        const dx = x - centerX;
+                        const y = h - 40 - 60 * Math.exp(-(dx * dx) / (2 * 50 * 50));
+                        if (x === 50) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Component 3: Broad wing (red)
+                    ctx.strokeStyle = '#f87171';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#f87171';
+                    ctx.beginPath();
+                    for (let x = 50; x < w - 30; x++) {
+                        const dx = x - centerX - 40; // Offset for blueshift
+                        const y = h - 40 - 35 * Math.exp(-(dx * dx) / (2 * 80 * 80));
+                        if (x === 50) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Total fit (white)
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    for (let x = 50; x < w - 30; x++) {
+                        const dx = x - centerX;
+                        const g1 = 120 * Math.exp(-(dx * dx) / (2 * 20 * 20));
+                        const g2 = 60 * Math.exp(-(dx * dx) / (2 * 50 * 50));
+                        const g3 = 35 * Math.exp(-((dx + 40) * (dx + 40)) / (2 * 80 * 80));
+                        const y = h - 40 - (g1 + g2 + g3);
+                        if (x === 50) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    // Legend
+                    const legendX = w - 180;
+                    const legendY = 40;
+                    ctx.font = '11px sans-serif';
+
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillRect(legendX, legendY, 15, 3);
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillText('Narrow core', legendX + 20, legendY + 3);
+
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.fillRect(legendX, legendY + 15, 15, 3);
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillText('Intermediate', legendX + 20, legendY + 18);
+
+                    ctx.fillStyle = '#f87171';
+                    ctx.fillRect(legendX, legendY + 30, 15, 3);
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillText('Broad wing', legendX + 20, legendY + 33);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(legendX, legendY + 45, 15, 3);
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillText('Total fit', legendX + 20, legendY + 48);
+                }
+            }
         },
         gc: {
             title: 'Globular Cluster Dynamics',
@@ -787,6 +1009,11 @@ function initModal() {
                     <p>${details.collaborators.join(', ')}</p>
                 `;
                 modal.style.display = 'block';
+
+                // Initialize canvas visualizations after modal is visible
+                if (details.initVisuals) {
+                    setTimeout(() => details.initVisuals(), 50);
+                }
             }
         });
     });
