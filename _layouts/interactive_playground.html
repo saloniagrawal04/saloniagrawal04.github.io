@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="{{ site.locale | slice: 0,2 }}" class="no-js" data-theme="interactive-playground">
+
+<head>
+    {% include head.html %}
+    {% include head/custom.html %}
+    <style>
+        /* Layout Specific Styles */
+        #physics-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .playground-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+            /* Let clicks pass through to canvas if needed */
+        }
+
+        .hero-content {
+            pointer-events: auto;
+            background: rgba(17, 17, 17, 0.7);
+            padding: 40px;
+            border: 1px solid #343434;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(0, 209, 255, 0.5);
+        }
+
+        .hero-subtitle {
+            font-family: 'Fira Code', monospace;
+            color: #00D1FF;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .research-section {
+            width: 100%;
+            padding: 100px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            color: #FF1E99;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .research-card {
+            background: rgba(17, 17, 17, 0.8);
+            border: 1px solid #343434;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .research-card:hover {
+            transform: translateY(-10px);
+            border-color: #00D1FF;
+            box-shadow: 0 0 20px rgba(0, 209, 255, 0.2);
+        }
+
+        .card-visual {
+            flex-grow: 1;
+            background: #000;
+            margin-bottom: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+        }
+
+        .card-desc {
+            font-size: 1rem;
+            color: #CCCCCC;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* AGN Animation */
+        .agn-cone {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-top: 100px solid rgba(0, 209, 255, 0.5);
+            animation: spin 4s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        .agn-cone.bottom {
+            border-top: none;
+            border-bottom: 100px solid rgba(255, 30, 153, 0.5);
+            margin-top: -20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotateY(0deg) rotateX(20deg);
+            }
+
+            100% {
+                transform: rotateY(360deg) rotateX(20deg);
+            }
+        }
+
+        /* Dark Matter Animation */
+        .dm-pulse {
+            width: 20px;
+            height: 20px;
+            background: #FF1E99;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FF1E99;
+            animation: pulseMove 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseMove {
+            0% {
+                transform: scale(0.5);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.5);
+                opacity: 0.5;
+            }
+        }
+
+        /* Timeline */
+        .timeline-section {
+            width: 100%;
+            padding: 100px 0;
+        }
+
+        .timeline-bar {
+            width: 4px;
+            background: #343434;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 40px 0;
+            width: 50%;
+            padding: 0 40px;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: #00D1FF;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <canvas id="physics-canvas"></canvas>
+
+    <div class="playground-container">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Saloni Agrawal</h1>
+                <p class="hero-subtitle">&lt;Computational Astrophysicist /&gt;</p>
+                <p style="font-family: 'Inter'; max-width: 600px; margin: 0 auto 20px;">
+                    Simulating the universe, one line of code at a time.
+                    <br>AGN Outflows | Globular Clusters | Dark Matter
+                </p>
+                <a href="#research" class="btn-physics">Initialize Simulation</a>
+            </div>
+        </div>
+
+        <div id="research" class="research-section">
+            <h2 class="section-title">Research Modules</h2>
+            <div class="cards-container">
+                <!-- AGN Card -->
+                <div class="research-card">
+                    <div class="card-visual">
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                            <div class="agn-cone"></div>
+                            <div class="agn-cone bottom"></div>
+                        </div>
+                    </div>
+                    <h3 class="card-title">AGN Outflows</h3>
+                    <p class="card-desc">Studying galactic winds using KCWI spectroscopy. Analyzing the feedback
+                        mechanisms of supermassive black holes.</p>
+                </div>
+
+                <!-- Globular Clusters Card -->
+                <div class="research-card">
+                    <div class="card-visual" id="gc-canvas-container">
+                        <!-- JS will inject canvas here -->
+                    </div>
+                    <h3 class="card-title">Globular Clusters</h3>
+                    <p class="card-desc">Simulating N-body dynamics to understand black hole retention and binary mass
+                        fractions in dense star clusters.</p>
+                </div>
+
+                <!-- Dark Matter Card -->
+                <div class="research-card">
+                    <div class="card-visual">
+                        <div class="dm-pulse"></div>
+                    </div>
+                    <h3 class="card-title">Dark Matter</h3>
+                    <p class="card-desc">Characterizing backgrounds in the XENONnT detector to hunt for WIMPs and other
+                        dark matter candidates.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-section">
+            <h2 class="section-title">Timeline</h2>
+            <div class="timeline-bar">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>2024</h3>
+                    <p>Research at UCSD (AGN & Dark Matter)</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>2023</h3>
+                    <p>Globular Cluster Dynamics with Dr. Kyle Kremer</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>2022</h3>
+                    <p>Started Physics/Astrophysics at UCSD</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/physics_playground.js"></script>
+</body>
+
+</html>

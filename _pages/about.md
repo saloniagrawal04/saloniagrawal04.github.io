@@ -1,5 +1,5 @@
 ---
-layout: minimal_centered
+layout: interactive_playground
 permalink: /
 title: "Saloni Agrawal"
 author_profile: false
