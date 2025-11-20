@@ -1619,21 +1619,280 @@ function initModal() {
             collaborators: ['Prof. Javier Duarte', 'CMS Collaboration']
         },
         kcwi: {
-            title: 'KCWI/KCRM Reduction',
+            title: 'KCWI/KCRM Data Reduction',
             advisor: 'Prof. Alison Coil',
             description: `
-                <p style="margin-bottom: 2rem;">Complete documentation for reducing KCWI (Keck Cosmic Web Imager) and KCRM integral field spectroscopy data, including flux calibration, sky subtraction, and mosaicking workflows.</p>
+                <p style="margin-bottom: 2rem;">The Keck Cosmic Web Imager (KCWI) and Keck Cosmic Reionization Mapper (KCRM) produce 3D data cubes containing spatial and spectral information. Reduction of these datasets requires careful calibration, sky subtraction, and mosaicking to create science-ready cubes for spectroscopic analysis.</p>
                 
-                <div style="margin-bottom: 1rem;">
-                    <a href="kcwi-reduction.pdf" class="btn btn-primary" download style="display: inline-block; margin-right: 1rem;">Download PDF</a>
-                    <a href="kcwi-reduction.pdf" class="btn btn-secondary" target="_blank" style="display: inline-block;">View in New Tab</a>
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Four-Step Workflow</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div>
+                        <canvas id="kcwi-step1" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>1. Initial Calibration (KCWI DRP)</strong><br>Bias/dark subtraction, flat fields, wavelength calibration, geometric rectification.</p>
+                    </div>
+                    <div>
+                        <canvas id="kcwi-step2" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>2. Flux Calibration (KSkyWizard)</strong><br>Construct sensitivity and telluric correction curves using standard star observations.</p>
+                    </div>
+                    <div>
+                        <canvas id="kcwi-step3" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>3. Sky Subtraction (ZAP)</strong><br>PCA-based sky modeling and subtraction using ZAP.</p>
+                    </div>
+                    <div>
+                        <canvas id="kcwi-step4" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>4. Resampling & Mosaicking</strong><br>Resample cubes, align pointings, and build final mosaics.</p>
+                    </div>
                 </div>
                 
-                <div style="margin-top: 2rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3);">
-                    <iframe src="kcwi-reduction.pdf" width="100%" height="800px" style="border: none;"></iframe>
-                </div>
+                <p style="font-style: italic; color: #cbd5e1; margin-bottom: 2rem;">These steps convert raw KCWI/KCRM exposures into calibrated, sky-subtracted, mosaicked cubes ready for emission-line fitting and kinematic mapping.</p>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Key Challenges</h3>
+                <ul style="margin-left: 1.5rem; margin-bottom: 2rem; color: #cbd5e1;">
+                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Sky Residuals:</strong> Removing sky emission without affecting galaxy signal</li>
+                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Tellurics:</strong> Correcting atmospheric absorption in redder wavelengths</li>
+                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Flux Calibration:</strong> Ensuring accurate sensitivity across full wavelength range</li>
+                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Alignment:</strong> Matching spatial offsets and rotations between exposures</li>
+                </ul>
+                
+                <p style="margin-top: 2rem;">This reduction pipeline enables high-fidelity measurements of galaxy kinematics, spatially resolved emission lines, and AGN-driven outflows.</p>
             `,
-            collaborators: ['Prof. Alison Coil', 'KCWI Team']
+            collaborators: ['Prof. Alison Coil', 'KCWI Team'],
+            initVisuals: function () {
+                // Step 1: Initial Calibration Pipeline
+                const step1Canvas = document.getElementById('kcwi-step1');
+                if (step1Canvas) {
+                    const ctx = step1Canvas.getContext('2d');
+                    const w = step1Canvas.width;
+                    const h = step1Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Draw pipeline flow
+                    const steps = ['Raw', 'Bias', 'Flat', 'Arc', 'Cube'];
+                    const stepWidth = (w - 60) / 5;
+
+                    steps.forEach((label, i) => {
+                        const x = 30 + i * stepWidth;
+                        const y = h / 2;
+
+                        // Box
+                        ctx.fillStyle = i === steps.length - 1 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(96, 165, 250, 0.2)';
+                        ctx.strokeStyle = i === steps.length - 1 ? '#10b981' : '#60a5fa';
+                        ctx.lineWidth = 2;
+                        ctx.fillRect(x - 20, y - 15, 40, 30);
+                        ctx.strokeRect(x - 20, y - 15, 40, 30);
+
+                        // Label
+                        ctx.fillStyle = '#cbd5e1';
+                        ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(label, x, y + 4);
+
+                        // Arrow
+                        if (i < steps.length - 1) {
+                            ctx.strokeStyle = '#60a5fa';
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.moveTo(x + 20, y);
+                            ctx.lineTo(x + stepWidth - 20, y);
+                            ctx.stroke();
+
+                            // Arrowhead
+                            ctx.fillStyle = '#60a5fa';
+                            ctx.beginPath();
+                            ctx.moveTo(x + stepWidth - 20, y);
+                            ctx.lineTo(x + stepWidth - 25, y - 3);
+                            ctx.lineTo(x + stepWidth - 25, y + 3);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    });
+                }
+
+                // Step 2: Flux Calibration
+                const step2Canvas = document.getElementById('kcwi-step2');
+                if (step2Canvas) {
+                    const ctx = step2Canvas.getContext('2d');
+                    const w = step2Canvas.width;
+                    const h = step2Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Draw standard star spectrum
+                    ctx.strokeStyle = '#94a3b8';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.beginPath();
+                    for (let x = 40; x < w - 30; x += 2) {
+                        const noise = Math.random() * 10 - 5;
+                        const y = h - 50 - 40 * Math.sin((x - 40) / 30) + noise;
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Draw sensitivity curve (smooth spline)
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#10b981';
+                    ctx.beginPath();
+                    for (let x = 40; x < w - 30; x++) {
+                        const y = h - 50 - 40 * Math.sin((x - 40) / 30);
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Draw spline knots
+                    for (let i = 0; i < 4; i++) {
+                        const x = 60 + i * 50;
+                        const y = h - 50 - 40 * Math.sin((x - 40) / 30);
+                        ctx.fillStyle = '#f87171';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Labels
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText('Wavelength', w / 2 - 20, h - 10);
+                    ctx.save();
+                    ctx.translate(15, h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText('Sensitivity', -25, 0);
+                    ctx.restore();
+                }
+
+                // Step 3: Sky Subtraction (ZAP)
+                const step3Canvas = document.getElementById('kcwi-step3');
+                if (step3Canvas) {
+                    const ctx = step3Canvas.getContext('2d');
+                    const w = step3Canvas.width;
+                    const h = step3Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    const midY = h / 2;
+
+                    // Raw spectrum with sky lines (top half)
+                    ctx.strokeStyle = '#f87171';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    for (let x = 40; x < w - 30; x++) {
+                        let y = midY - 40;
+                        // Add sky emission spikes
+                        if (x % 40 < 5) y -= 20;
+                        if (x % 60 < 5) y -= 15;
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#f87171';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('Raw (with sky)', 45, midY - 60);
+
+                    // Cleaned spectrum (bottom half)
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#10b981';
+                    ctx.beginPath();
+                    for (let x = 40; x < w - 30; x++) {
+                        const y = midY + 40;
+                        if (x === 40) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('Sky-subtracted', 45, midY + 65);
+
+                    // PCA arrow
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(w - 60, midY - 20);
+                    ctx.lineTo(w - 60, midY + 20);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.beginPath();
+                    ctx.moveTo(w - 60, midY + 20);
+                    ctx.lineTo(w - 65, midY + 15);
+                    ctx.lineTo(w - 55, midY + 15);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('PCA', w - 75, midY);
+                }
+
+                // Step 4: Mosaicking
+                const step4Canvas = document.getElementById('kcwi-step4');
+                if (step4Canvas) {
+                    const ctx = step4Canvas.getContext('2d');
+                    const w = step4Canvas.width;
+                    const h = step4Canvas.height;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    const cx = w / 2;
+                    const cy = h / 2;
+
+                    // Draw three cubes being combined
+                    const cubes = [
+                        { x: cx - 60, y: cy - 20, angle: -5 },
+                        { x: cx, y: cy - 25, angle: 0 },
+                        { x: cx + 60, y: cy - 20, angle: 5 }
+                    ];
+
+                    cubes.forEach((cube, i) => {
+                        ctx.save();
+                        ctx.translate(cube.x, cube.y);
+                        ctx.rotate(cube.angle * Math.PI / 180);
+
+                        // Cube outline
+                        ctx.strokeStyle = i === 1 ? '#60a5fa' : 'rgba(96, 165, 250, 0.5)';
+                        ctx.lineWidth = i === 1 ? 2 : 1;
+                        ctx.strokeRect(-15, -15, 30, 30);
+
+                        ctx.restore();
+                    });
+
+                    // Arrows pointing down
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    cubes.forEach(cube => {
+                        ctx.beginPath();
+                        ctx.moveTo(cube.x, cube.y + 20);
+                        ctx.lineTo(cube.x, cy + 40);
+                        ctx.stroke();
+                    });
+
+                    // Final mosaic cube
+                    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#10b981';
+                    ctx.fillRect(cx - 35, cy + 45, 70, 40);
+                    ctx.strokeRect(cx - 35, cy + 45, 70, 40);
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '10px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Final Mosaic', cx, cy + 70);
+                }
+            }
         }
     };
 
