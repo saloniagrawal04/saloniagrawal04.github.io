@@ -78,32 +78,60 @@ function initBackgroundSimulation() {
     };
 
     const particles = [];
-    const numParticles = 150;
-    const numStars = 100; // Increased star count
-    const numNebulae = 5;
+    const numParticles = 100;
+    const numStars = 150;
+    const numNebulae = 8;
 
     // Nebula class for background ambiance
     class Nebula {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.radius = Math.random() * 400 + 200;
-            // Cyan or Soft Gold/Indigo with very low opacity
-            const colors = ['rgba(34, 211, 238, 0.02)', 'rgba(129, 140, 248, 0.02)', 'rgba(252, 211, 77, 0.01)'];
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-            this.vx = (Math.random() - 0.5) * 0.1;
-            this.vy = (Math.random() - 0.5) * 0.1;
+        constructor(isHero = false) {
+            this.isHero = isHero;
+            if (isHero) {
+                // Hero nebula: Centered, larger, brighter
+                this.x = canvas.width / 2 + (Math.random() - 0.5) * 200;
+                this.y = canvas.height / 3 + (Math.random() - 0.5) * 100;
+                this.radius = Math.random() * 300 + 300;
+                this.vx = (Math.random() - 0.5) * 0.05;
+                this.vy = (Math.random() - 0.5) * 0.05;
+                // Mix of Teal, Lime, and Deep Blue
+                const colors = [
+                    'rgba(45, 212, 191, 0.08)', // Teal
+                    'rgba(163, 230, 53, 0.05)', // Lime
+                    'rgba(14, 165, 233, 0.06)'  // Sky Blue
+                ];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            } else {
+                // Background nebulae
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 400 + 200;
+                this.vx = (Math.random() - 0.5) * 0.1;
+                this.vy = (Math.random() - 0.5) * 0.1;
+                const colors = [
+                    'rgba(45, 212, 191, 0.03)', // Teal
+                    'rgba(163, 230, 53, 0.02)', // Lime
+                    'rgba(8, 145, 178, 0.03)'   // Darker Cyan
+                ];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
         }
 
         update() {
             this.x += this.vx;
             this.y += this.vy;
 
-            // Wrap around screen
-            if (this.x < -this.radius) this.x = canvas.width + this.radius;
-            if (this.x > canvas.width + this.radius) this.x = -this.radius;
-            if (this.y < -this.radius) this.y = canvas.height + this.radius;
-            if (this.y > canvas.height + this.radius) this.y = -this.radius;
+            // Wrap around screen (looser bounds for hero nebulae to keep them central-ish)
+            if (this.isHero) {
+                if (this.x < -this.radius) this.x = canvas.width + this.radius;
+                if (this.x > canvas.width + this.radius) this.x = -this.radius;
+                if (this.y < -this.radius) this.y = canvas.height + this.radius;
+                if (this.y > canvas.height + this.radius) this.y = -this.radius;
+            } else {
+                if (this.x < -this.radius) this.x = canvas.width + this.radius;
+                if (this.x > canvas.width + this.radius) this.x = -this.radius;
+                if (this.y < -this.radius) this.y = canvas.height + this.radius;
+                if (this.y > canvas.height + this.radius) this.y = -this.radius;
+            }
         }
 
         draw() {
@@ -128,8 +156,8 @@ function initBackgroundSimulation() {
             this.vy = Math.random() * 2 - 1;
             this.size = Math.random() * 1.5 + 0.5;
             this.opacity = Math.random() * 0.5 + 0.3;
-            // Cyan or Soft Gold
-            this.color = Math.random() > 0.5 ? '#22d3ee' : '#fcd34d';
+            // Teal or Lime
+            this.color = Math.random() > 0.5 ? '#2dd4bf' : '#a3e635';
         }
 
         update() {
@@ -211,7 +239,7 @@ function initBackgroundSimulation() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#f0fdfa'; // Pale Mint stars
             ctx.globalAlpha = this.opacity;
             ctx.fill();
             ctx.globalAlpha = 1;
@@ -220,8 +248,13 @@ function initBackgroundSimulation() {
 
     // Initialize objects
     const nebulae = [];
+    // Add Hero Nebulae (Front/Center)
+    for (let i = 0; i < 5; i++) {
+        nebulae.push(new Nebula(true));
+    }
+    // Add Background Nebulae
     for (let i = 0; i < numNebulae; i++) {
-        nebulae.push(new Nebula());
+        nebulae.push(new Nebula(false));
     }
 
     for (let i = 0; i < numParticles; i++) {
@@ -262,8 +295,8 @@ function initBackgroundSimulation() {
             blackHole.x, blackHole.y, 30
         );
         gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        gradient.addColorStop(0.5, 'rgba(34, 211, 238, 0.3)'); // Cyan glow
-        gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+        gradient.addColorStop(0.5, 'rgba(45, 212, 191, 0.3)'); // Teal glow
+        gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
         ctx.fillStyle = gradient;
         ctx.fill();
 
@@ -274,7 +307,7 @@ function initBackgroundSimulation() {
         });
 
         // Draw AGN outflow jets (subtle lines)
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.2)'; // Cyan jets
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.2)'; // Teal jets
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(blackHole.x, blackHole.y - 15);
@@ -327,12 +360,12 @@ function animateAGN() {
         const coneHeight = 60;
         const coneWidth = 35;
 
-        // Draw LEFT CONE (CYAN - Blueshift)
+        // Draw LEFT CONE (TEAL - Blueshift)
         // Top left cone
         const leftGradientTop = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy - coneHeight);
-        leftGradientTop.addColorStop(0, 'rgba(34, 211, 238, 0.1)');
-        leftGradientTop.addColorStop(0.5, 'rgba(34, 211, 238, 0.4)');
-        leftGradientTop.addColorStop(1, 'rgba(34, 211, 238, 0.6)');
+        leftGradientTop.addColorStop(0, 'rgba(45, 212, 191, 0.1)');
+        leftGradientTop.addColorStop(0.5, 'rgba(45, 212, 191, 0.4)');
+        leftGradientTop.addColorStop(1, 'rgba(45, 212, 191, 0.6)');
 
         ctx.fillStyle = leftGradientTop;
         ctx.beginPath();
@@ -344,9 +377,9 @@ function animateAGN() {
 
         // Bottom left cone
         const leftGradientBottom = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy + coneHeight);
-        leftGradientBottom.addColorStop(0, 'rgba(34, 211, 238, 0.1)');
-        leftGradientBottom.addColorStop(0.5, 'rgba(34, 211, 238, 0.4)');
-        leftGradientBottom.addColorStop(1, 'rgba(34, 211, 238, 0.6)');
+        leftGradientBottom.addColorStop(0, 'rgba(45, 212, 191, 0.1)');
+        leftGradientBottom.addColorStop(0.5, 'rgba(45, 212, 191, 0.4)');
+        leftGradientBottom.addColorStop(1, 'rgba(45, 212, 191, 0.6)');
 
         ctx.fillStyle = leftGradientBottom;
         ctx.beginPath();
@@ -385,7 +418,7 @@ function animateAGN() {
         ctx.closePath();
         ctx.fill();
 
-        // Draw flowing particles in left cone (cyan)
+        // Draw flowing particles in left cone (teal)
         for (let i = 0; i < 6; i++) {
             const offset = (flowPhase + i * 15) % 60;
             const progress = offset / 60;
@@ -394,7 +427,7 @@ function animateAGN() {
             const x2 = cx - progress * coneWidth;
             const y2 = cy + progress * coneHeight;
 
-            ctx.fillStyle = `rgba(34, 211, 238, ${1 - progress})`;
+            ctx.fillStyle = `rgba(45, 212, 191, ${1 - progress})`;
             ctx.beginPath();
             ctx.arc(x1, y1, 2, 0, Math.PI * 2);
             ctx.fill();
@@ -472,7 +505,7 @@ function animateGC() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw center
-        ctx.fillStyle = '#fcd34d';
+        ctx.fillStyle = '#a3e635';
         ctx.beginPath();
         ctx.arc(cx, cy, 4, 0, Math.PI * 2);
         ctx.fill();
@@ -518,12 +551,12 @@ function animateDM() {
         const interactionPoint = tpcBottom - 30; // Where particle interacts
 
         // Draw TPC chamber outline
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.3)';
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
         ctx.lineWidth = 2;
         ctx.strokeRect(cx - 40, tpcTop, 80, tpcHeight);
 
         // Draw horizontal lines for TPC structure
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.15)';
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.15)';
         ctx.lineWidth = 1;
         for (let y = tpcTop + 15; y < tpcBottom; y += 15) {
             ctx.beginPath();
@@ -562,9 +595,9 @@ function animateDM() {
 
             // S1 scintillation flash
             const s1Gradient = ctx.createRadialGradient(cx, interactionPoint, 0, cx, interactionPoint, flashRadius);
-            s1Gradient.addColorStop(0, `rgba(34, 211, 238, ${flashOpacity})`);
-            s1Gradient.addColorStop(0.5, `rgba(34, 211, 238, ${flashOpacity * 0.5})`);
-            s1Gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+            s1Gradient.addColorStop(0, `rgba(45, 212, 191, ${flashOpacity})`);
+            s1Gradient.addColorStop(0.5, `rgba(45, 212, 191, ${flashOpacity * 0.5})`);
+            s1Gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
 
             ctx.fillStyle = s1Gradient;
             ctx.beginPath();
@@ -587,14 +620,14 @@ function animateDM() {
             for (let i = 0; i < 5; i++) {
                 const offsetX = (Math.sin(phase * 0.1 + i) * 8);
                 const offsetY = i * 5;
-                ctx.fillStyle = `rgba(34, 211, 238, ${0.6 * (1 - driftProgress * 0.5)})`;
+                ctx.fillStyle = `rgba(45, 212, 191, ${0.6 * (1 - driftProgress * 0.5)})`;
                 ctx.beginPath();
                 ctx.arc(cx + offsetX, electronY + offsetY, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             // Drift path
-            ctx.strokeStyle = `rgba(34, 211, 238, ${0.2 * (1 - driftProgress)})`;
+            ctx.strokeStyle = `rgba(45, 212, 191, ${0.2 * (1 - driftProgress)})`;
             ctx.lineWidth = 1;
             ctx.setLineDash([2, 2]);
             ctx.beginPath();
@@ -613,9 +646,9 @@ function animateDM() {
 
             // S2 scintillation flash (larger than S1)
             const s2Gradient = ctx.createRadialGradient(cx, s2Y, 0, cx, s2Y, s2Radius);
-            s2Gradient.addColorStop(0, `rgba(34, 211, 238, ${s2Opacity})`);
-            s2Gradient.addColorStop(0.4, `rgba(34, 211, 238, ${s2Opacity * 0.6})`);
-            s2Gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+            s2Gradient.addColorStop(0, `rgba(45, 212, 191, ${s2Opacity})`);
+            s2Gradient.addColorStop(0.4, `rgba(45, 212, 191, ${s2Opacity * 0.6})`);
+            s2Gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
 
             ctx.fillStyle = s2Gradient;
             ctx.beginPath();
@@ -635,11 +668,11 @@ function animateDM() {
             ctx.font = '9px monospace';
             ctx.fillText('DM particle', cx + 10, tpcTop + 30);
         } else if (phase >= 40 && phase < 80) {
-            ctx.fillStyle = 'rgba(34, 211, 238, 0.7)';
+            ctx.fillStyle = 'rgba(45, 212, 191, 0.7)';
             ctx.font = '9px monospace';
             ctx.fillText('S1', cx + 18, interactionPoint);
         } else if (phase >= 140 && phase < 180) {
-            ctx.fillStyle = 'rgba(34, 211, 238, 0.7)';
+            ctx.fillStyle = 'rgba(45, 212, 191, 0.7)';
             ctx.font = '9px monospace';
             ctx.fillText('S2', cx + 28, tpcTop + 20);
         }
@@ -674,24 +707,24 @@ function animateKCWI() {
         const cubeSize = 40;
 
         // Back face
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.3)';
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2 + 10, cy - cubeSize / 2 - 10, cubeSize, cubeSize);
         ctx.stroke();
 
         // Front face
-        ctx.strokeStyle = '#22d3ee';
+        ctx.strokeStyle = '#2dd4bf';
         ctx.lineWidth = 2;
         ctx.shadowBlur = 8;
-        ctx.shadowColor = '#22d3ee';
+        ctx.shadowColor = '#2dd4bf';
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2, cy - cubeSize / 2, cubeSize, cubeSize);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
         // Connect corners
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.5)';
         ctx.lineWidth = 1;
         [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => {
             ctx.beginPath();
@@ -704,7 +737,7 @@ function animateKCWI() {
         for (let i = 0; i < 3; i++) {
             const offset = (phase + i * 20) % 60;
             const alpha = 1 - offset / 60;
-            ctx.strokeStyle = `rgba(252, 211, 77, ${alpha})`;
+            ctx.strokeStyle = `rgba(163, 230, 53, ${alpha})`;
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             const y = cy - 15 + i * 15 - offset * 0.5;
@@ -789,10 +822,10 @@ function initModal() {
                     ctx.restore();
 
                     // Draw narrow Gaussian
-                    ctx.strokeStyle = '#22d3ee';
+                    ctx.strokeStyle = '#2dd4bf';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#22d3ee';
+                    ctx.shadowColor = '#2dd4bf';
                     ctx.beginPath();
                     const centerX = w / 2;
                     const sigma = 15;
@@ -891,11 +924,11 @@ function initModal() {
 
                     const centerX = w / 2;
 
-                    // Component 1: Narrow core (cyan)
-                    ctx.strokeStyle = '#22d3ee';
+                    // Component 1: Narrow core (teal)
+                    ctx.strokeStyle = '#2dd4bf';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#22d3ee';
+                    ctx.shadowColor = '#2dd4bf';
                     ctx.beginPath();
                     for (let x = 50; x < w - 30; x++) {
                         const dx = x - centerX;
@@ -906,11 +939,11 @@ function initModal() {
                     ctx.stroke();
                     ctx.shadowBlur = 0;
 
-                    // Component 2: Intermediate (gold)
-                    ctx.strokeStyle = '#fcd34d';
+                    // Component 2: Intermediate (lime)
+                    ctx.strokeStyle = '#a3e635';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#fcd34d';
+                    ctx.shadowColor = '#a3e635';
                     ctx.beginPath();
                     for (let x = 50; x < w - 30; x++) {
                         const dx = x - centerX;
@@ -956,12 +989,12 @@ function initModal() {
                     const legendY = 40;
                     ctx.font = '11px sans-serif';
 
-                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillStyle = '#2dd4bf';
                     ctx.fillRect(legendX, legendY, 15, 3);
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillText('Narrow core', legendX + 20, legendY + 3);
 
-                    ctx.fillStyle = '#fcd34d';
+                    ctx.fillStyle = '#a3e635';
                     ctx.fillRect(legendX, legendY + 15, 15, 3);
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillText('Intermediate', legendX + 20, legendY + 18);
@@ -1063,7 +1096,7 @@ function initModal() {
                         if (x >= 0 && x <= w && y >= 0 && y <= h) {
                             ctx.fillStyle = '#ffffff';
                             ctx.shadowBlur = 6;
-                            ctx.shadowColor = '#fcd34d';
+                            ctx.shadowColor = '#a3e635';
                             ctx.beginPath();
                             ctx.arc(x, y, size, 0, Math.PI * 2);
                             ctx.fill();
@@ -1110,10 +1143,10 @@ function initModal() {
                     });
 
                     // Draw King profile curve
-                    ctx.strokeStyle = '#22d3ee';
+                    ctx.strokeStyle = '#2dd4bf';
                     ctx.lineWidth = 3;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#22d3ee';
+                    ctx.shadowColor = '#2dd4bf';
                     ctx.beginPath();
 
                     const rc = 3; // Core radius
@@ -1188,9 +1221,9 @@ function initModal() {
                     ctx.setLineDash([]);
 
                     // Binary stars
-                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillStyle = '#2dd4bf';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#22d3ee';
+                    ctx.shadowColor = '#2dd4bf';
                     ctx.beginPath();
                     ctx.arc(star1X, star1Y, 5, 0, Math.PI * 2);
                     ctx.fill();
@@ -1230,7 +1263,7 @@ function initModal() {
                     // Ejection arrow (one star gets kicked out)
                     const ejectX = cx + 100;
                     const ejectY = cy + 60;
-                    ctx.strokeStyle = '#fcd34d';
+                    ctx.strokeStyle = '#a3e635';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(cx + 40, cy + 10);
@@ -1238,7 +1271,7 @@ function initModal() {
                     ctx.stroke();
 
                     // Arrowhead
-                    ctx.fillStyle = '#fcd34d';
+                    ctx.fillStyle = '#a3e635';
                     ctx.beginPath();
                     ctx.moveTo(ejectX - 10, ejectY - 10);
                     ctx.lineTo(ejectX - 15, ejectY - 15);
@@ -1319,10 +1352,10 @@ function initModal() {
                     for (let i = 0; i < 8; i++) {
                         const angle = (Math.PI * 2 * i) / 8;
                         const length = 25;
-                        ctx.strokeStyle = '#22d3ee';
+                        ctx.strokeStyle = '#2dd4bf';
                         ctx.lineWidth = 2;
                         ctx.shadowBlur = 8;
-                        ctx.shadowColor = '#22d3ee';
+                        ctx.shadowColor = '#2dd4bf';
                         ctx.beginPath();
                         ctx.moveTo(w / 2, interactionY);
                         ctx.lineTo(w / 2 + Math.cos(angle) * length, interactionY + Math.sin(angle) * length);
@@ -1360,9 +1393,9 @@ function initModal() {
                     for (let i = 0; i < 4; i++) {
                         const y = interactionY - 20 - i * 15;
                         const x = w / 2 + (Math.sin(i) * 5);
-                        ctx.fillStyle = '#22d3ee';
+                        ctx.fillStyle = '#2dd4bf';
                         ctx.shadowBlur = 6;
-                        ctx.shadowColor = '#22d3ee';
+                        ctx.shadowColor = '#2dd4bf';
                         ctx.beginPath();
                         ctx.arc(x, y, 2, 0, Math.PI * 2);
                         ctx.fill();
@@ -1370,7 +1403,7 @@ function initModal() {
                     ctx.shadowBlur = 0;
 
                     // Drift arrow
-                    ctx.strokeStyle = '#22d3ee';
+                    ctx.strokeStyle = '#2dd4bf';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([3, 3]);
                     ctx.beginPath();
@@ -1384,10 +1417,10 @@ function initModal() {
                     for (let i = 0; i < 12; i++) {
                         const angle = (Math.PI * 2 * i) / 12;
                         const length = 20;
-                        ctx.strokeStyle = '#fcd34d';
+                        ctx.strokeStyle = '#a3e635';
                         ctx.lineWidth = 2;
                         ctx.shadowBlur = 10;
-                        ctx.shadowColor = '#fcd34d';
+                        ctx.shadowColor = '#a3e635';
                         ctx.beginPath();
                         ctx.moveTo(w / 2, s2Y);
                         ctx.lineTo(w / 2 + Math.cos(angle) * length, s2Y + Math.sin(angle) * length);
@@ -1427,10 +1460,10 @@ function initModal() {
 
                     // Large S2 peak
                     const s2X = 150;
-                    ctx.strokeStyle = '#fcd34d';
+                    ctx.strokeStyle = '#a3e635';
                     ctx.lineWidth = 3;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#fcd34d';
+                    ctx.shadowColor = '#a3e635';
                     ctx.beginPath();
                     for (let x = s2X - 30; x < s2X + 30; x++) {
                         const dx = x - s2X;
@@ -1442,7 +1475,7 @@ function initModal() {
                     ctx.shadowBlur = 0;
 
                     // Label S2
-                    ctx.fillStyle = '#fcd34d';
+                    ctx.fillStyle = '#a3e635';
                     ctx.font = '12px sans-serif';
                     ctx.fillText('S2', s2X - 8, 40);
 
@@ -1492,9 +1525,9 @@ function initModal() {
 
                     // S2 peak
                     const s2X = 120;
-                    ctx.fillStyle = '#fcd34d';
+                    ctx.fillStyle = '#a3e635';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#fcd34d';
+                    ctx.shadowColor = '#a3e635';
                     ctx.beginPath();
                     ctx.arc(s2X, h / 2, 8, 0, Math.PI * 2);
                     ctx.fill();
@@ -1522,7 +1555,7 @@ function initModal() {
                         ctx.shadowBlur = 0;
 
                         // Matching arrow
-                        ctx.strokeStyle = '#22d3ee';
+                        ctx.strokeStyle = '#2dd4bf';
                         ctx.lineWidth = 2;
                         ctx.setLineDash([4, 4]);
                         ctx.beginPath();
