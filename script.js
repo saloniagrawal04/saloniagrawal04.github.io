@@ -70,252 +70,81 @@ function initBackgroundSimulation() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Simulation parameters
-    const blackHole = {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        mass: 1000
-    };
-
-    const particles = [];
-    const numParticles = 100;
-    const numStars = 150;
-    const numNebulae = 8;
-
-    // Nebula class for background ambiance
-    class Nebula {
-        constructor(isHero = false) {
-            this.isHero = isHero;
-            if (isHero) {
-                // Hero nebula: Centered, larger, brighter
-                this.x = canvas.width / 2 + (Math.random() - 0.5) * 200;
-                this.y = canvas.height / 3 + (Math.random() - 0.5) * 100;
-                this.radius = Math.random() * 300 + 300;
-                this.vx = (Math.random() - 0.5) * 0.05;
-                this.vy = (Math.random() - 0.5) * 0.05;
-                // Mix of Teal, Lime, and Deep Blue
-                const colors = [
-                    'rgba(45, 212, 191, 0.08)', // Teal
-                    'rgba(163, 230, 53, 0.05)', // Lime
-                    'rgba(14, 165, 233, 0.06)'  // Sky Blue
-                ];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            } else {
-                // Background nebulae
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.radius = Math.random() * 400 + 200;
-                this.vx = (Math.random() - 0.5) * 0.1;
-                this.vy = (Math.random() - 0.5) * 0.1;
-                const colors = [
-                    'rgba(45, 212, 191, 0.03)', // Teal
-                    'rgba(163, 230, 53, 0.02)', // Lime
-                    'rgba(8, 145, 178, 0.03)'   // Darker Cyan
-                ];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // Wrap around screen (looser bounds for hero nebulae to keep them central-ish)
-            if (this.isHero) {
-                if (this.x < -this.radius) this.x = canvas.width + this.radius;
-                if (this.x > canvas.width + this.radius) this.x = -this.radius;
-                if (this.y < -this.radius) this.y = canvas.height + this.radius;
-                if (this.y > canvas.height + this.radius) this.y = -this.radius;
-            } else {
-                if (this.x < -this.radius) this.x = canvas.width + this.radius;
-                if (this.x > canvas.width + this.radius) this.x = -this.radius;
-                if (this.y < -this.radius) this.y = canvas.height + this.radius;
-                if (this.y > canvas.height + this.radius) this.y = -this.radius;
-            }
-        }
-
-        draw() {
-            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-            gradient.addColorStop(0, this.color);
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    // Particle class for accretion disk
-    class Particle {
-        constructor() {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 100 + Math.random() * 300;
-            this.x = blackHole.x + Math.cos(angle) * distance;
-            this.y = blackHole.y + Math.sin(angle) * distance;
-            this.vx = Math.random() * 2 - 1;
-            this.vy = Math.random() * 2 - 1;
-            this.size = Math.random() * 1.5 + 0.5;
-            this.opacity = Math.random() * 0.5 + 0.3;
-            // Teal or Lime
-            this.color = Math.random() > 0.5 ? '#2dd4bf' : '#a3e635';
-        }
-
-        update() {
-            // Calculate gravitational force
-            const dx = blackHole.x - this.x;
-            const dy = blackHole.y - this.y;
-            const distSq = dx * dx + dy * dy;
-            const dist = Math.sqrt(distSq);
-
-            // Prevent division by zero
-            if (dist < 5) {
-                this.reset();
-                return;
-            }
-
-            // Gravitational acceleration
-            const force = blackHole.mass / distSq;
-            const ax = (dx / dist) * force;
-            const ay = (dy / dist) * force;
-
-            // Update velocity and position
-            this.vx += ax * 0.01;
-            this.vy += ay * 0.01;
-
-            // Add tangential velocity for orbital motion
-            const tangentX = -dy / dist;
-            const tangentY = dx / dist;
-            this.vx += tangentX * 0.5;
-            this.vy += tangentY * 0.5;
-
-            // Apply velocity damping
-            this.vx *= 0.99;
-            this.vy *= 0.99;
-
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // Reset if too far
-            if (dist > 600) {
-                this.reset();
-            }
-        }
-
-        reset() {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 100 + Math.random() * 300;
-            this.x = blackHole.x + Math.cos(angle) * distance;
-            this.y = blackHole.y + Math.sin(angle) * distance;
-            this.vx = Math.random() * 2 - 1;
-            this.vy = Math.random() * 2 - 1;
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.globalAlpha = this.opacity;
-            ctx.fill();
-            ctx.globalAlpha = 1;
-        }
-    }
-
-    // Star class for background
-    class Star {
+    // Watercolor Nebula Blob class
+    class NebulaBlob {
         constructor() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 1.5;
-            this.opacity = Math.random() * 0.5 + 0.3;
-            this.twinkleSpeed = Math.random() * 0.02 + 0.01;
-            this.twinklePhase = Math.random() * Math.PI * 2;
+            this.radius = Math.random() * 300 + 200;
+            this.vx = (Math.random() - 0.5) * 0.2;
+            this.vy = (Math.random() - 0.5) * 0.2;
+
+            // Palette: Deep Teal, Turquoise, Matcha Bright
+            const colors = [
+                'rgba(0, 79, 111, 0.08)',   // Deep Teal (very transparent)
+                'rgba(47, 148, 106, 0.08)', // Turquoise
+                'rgba(161, 214, 58, 0.12)'  // Matcha Bright
+            ];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+
+            // Morphing properties
+            this.angle = Math.random() * Math.PI * 2;
+            this.morphSpeed = Math.random() * 0.002 + 0.001;
         }
 
         update() {
-            this.twinklePhase += this.twinkleSpeed;
-            this.opacity = 0.3 + Math.sin(this.twinklePhase) * 0.3;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.angle += this.morphSpeed;
+
+            // Wrap around screen
+            if (this.x < -this.radius) this.x = canvas.width + this.radius;
+            if (this.x > canvas.width + this.radius) this.x = -this.radius;
+            if (this.y < -this.radius) this.y = canvas.height + this.radius;
+            if (this.y > canvas.height + this.radius) this.y = -this.radius;
         }
 
         draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+
+            // Create organic blob shape
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = '#f0fdfa'; // Pale Mint stars
-            ctx.globalAlpha = this.opacity;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            ctx.fillStyle = gradient;
+            // Draw a slightly distorted circle
+            ctx.scale(1 + Math.sin(this.angle) * 0.2, 1 + Math.cos(this.angle) * 0.1);
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
             ctx.fill();
-            ctx.globalAlpha = 1;
+
+            ctx.restore();
         }
     }
 
-    // Initialize objects
-    const nebulae = [];
-    // Add Hero Nebulae (Front/Center)
-    for (let i = 0; i < 5; i++) {
-        nebulae.push(new Nebula(true));
-    }
-    // Add Background Nebulae
-    for (let i = 0; i < numNebulae; i++) {
-        nebulae.push(new Nebula(false));
-    }
-
-    for (let i = 0; i < numParticles; i++) {
-        particles.push(new Particle());
-    }
-
-    const stars = [];
-    for (let i = 0; i < numStars; i++) {
-        stars.push(new Star());
+    // Initialize blobs
+    const blobs = [];
+    const numBlobs = 12; // Enough to cover the screen with overlap
+    for (let i = 0; i < numBlobs; i++) {
+        blobs.push(new NebulaBlob());
     }
 
     // Animation loop
     function animate() {
-        // Update black hole position to center
-        blackHole.x = canvas.width / 2;
-        blackHole.y = canvas.height / 2;
-
-        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw nebulae first (background)
-        nebulae.forEach(nebula => {
-            nebula.update();
-            nebula.draw();
+        // Use multiply blending for watercolor effect
+        ctx.globalCompositeOperation = 'multiply';
+
+        blobs.forEach(blob => {
+            blob.update();
+            blob.draw();
         });
 
-        // Draw stars
-        stars.forEach(star => {
-            star.update();
-            star.draw();
-        });
-
-        // Draw black hole (event horizon)
-        ctx.beginPath();
-        ctx.arc(blackHole.x, blackHole.y, 15, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(
-            blackHole.x, blackHole.y, 0,
-            blackHole.x, blackHole.y, 30
-        );
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        gradient.addColorStop(0.5, 'rgba(45, 212, 191, 0.3)'); // Teal glow
-        gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Update and draw particles
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-        });
-
-        // Draw AGN outflow jets (subtle lines)
-        ctx.strokeStyle = 'rgba(45, 212, 191, 0.2)'; // Teal jets
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(blackHole.x, blackHole.y - 15);
-        ctx.lineTo(blackHole.x, blackHole.y - 200);
-        ctx.moveTo(blackHole.x, blackHole.y + 15);
-        ctx.lineTo(blackHole.x, blackHole.y + 200);
-        ctx.stroke();
-
+        ctx.globalCompositeOperation = 'source-over';
         requestAnimationFrame(animate);
     }
 
@@ -360,12 +189,12 @@ function animateAGN() {
         const coneHeight = 60;
         const coneWidth = 35;
 
-        // Draw LEFT CONE (TEAL - Blueshift)
+        // Draw LEFT CONE (Turquoise - Blueshift)
         // Top left cone
         const leftGradientTop = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy - coneHeight);
-        leftGradientTop.addColorStop(0, 'rgba(45, 212, 191, 0.1)');
-        leftGradientTop.addColorStop(0.5, 'rgba(45, 212, 191, 0.4)');
-        leftGradientTop.addColorStop(1, 'rgba(45, 212, 191, 0.6)');
+        leftGradientTop.addColorStop(0, 'rgba(47, 148, 106, 0.1)');
+        leftGradientTop.addColorStop(0.5, 'rgba(47, 148, 106, 0.3)');
+        leftGradientTop.addColorStop(1, 'rgba(47, 148, 106, 0.5)');
 
         ctx.fillStyle = leftGradientTop;
         ctx.beginPath();
@@ -377,9 +206,9 @@ function animateAGN() {
 
         // Bottom left cone
         const leftGradientBottom = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy + coneHeight);
-        leftGradientBottom.addColorStop(0, 'rgba(45, 212, 191, 0.1)');
-        leftGradientBottom.addColorStop(0.5, 'rgba(45, 212, 191, 0.4)');
-        leftGradientBottom.addColorStop(1, 'rgba(45, 212, 191, 0.6)');
+        leftGradientBottom.addColorStop(0, 'rgba(47, 148, 106, 0.1)');
+        leftGradientBottom.addColorStop(0.5, 'rgba(47, 148, 106, 0.3)');
+        leftGradientBottom.addColorStop(1, 'rgba(47, 148, 106, 0.5)');
 
         ctx.fillStyle = leftGradientBottom;
         ctx.beginPath();
@@ -418,7 +247,7 @@ function animateAGN() {
         ctx.closePath();
         ctx.fill();
 
-        // Draw flowing particles in left cone (teal)
+        // Draw flowing particles in left cone (Deep Teal)
         for (let i = 0; i < 6; i++) {
             const offset = (flowPhase + i * 15) % 60;
             const progress = offset / 60;
@@ -427,7 +256,7 @@ function animateAGN() {
             const x2 = cx - progress * coneWidth;
             const y2 = cy + progress * coneHeight;
 
-            ctx.fillStyle = `rgba(45, 212, 191, ${1 - progress})`;
+            ctx.fillStyle = `rgba(0, 79, 111, ${1 - progress})`;
             ctx.beginPath();
             ctx.arc(x1, y1, 2, 0, Math.PI * 2);
             ctx.fill();
@@ -488,43 +317,35 @@ function animateGC() {
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    const stars = [];
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-
-    for (let i = 0; i < 20; i++) {
-        stars.push({
-            angle: Math.random() * Math.PI * 2,
-            radius: Math.random() * 50 + 10,
-            speed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
-            size: Math.random() * 2 + 1
-        });
-    }
+    let phase = 0;
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw center
-        ctx.fillStyle = '#a3e635';
+        // Draw center (Matcha Bright)
+        ctx.fillStyle = '#A1D63A';
         ctx.beginPath();
         ctx.arc(cx, cy, 4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw orbiting stars
-        stars.forEach(star => {
-            star.angle += star.speed;
-            const x = cx + Math.cos(star.angle) * star.radius;
-            const y = cy + Math.sin(star.angle) * star.radius * 0.6;
+        // Draw stars (Deep Teal)
+        for (let i = 0; i < 12; i++) {
+            const angle = (phase * 0.05 + i) % (Math.PI * 2);
+            const r = 20 + Math.sin(phase * 0.02 + i) * 5;
+            const x = cx + Math.cos(angle) * r;
+            const y = cy + Math.sin(angle) * r;
 
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#004F6F';
             ctx.beginPath();
-            ctx.arc(x, y, star.size, 0, Math.PI * 2);
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
             ctx.fill();
-        });
+        }
 
+        phase++;
         requestAnimationFrame(draw);
     }
-
     draw();
 }
 
@@ -551,12 +372,12 @@ function animateDM() {
         const interactionPoint = tpcBottom - 30; // Where particle interacts
 
         // Draw TPC chamber outline
-        ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
+        ctx.strokeStyle = 'rgba(0, 79, 111, 0.5)';
         ctx.lineWidth = 2;
         ctx.strokeRect(cx - 40, tpcTop, 80, tpcHeight);
 
         // Draw horizontal lines for TPC structure
-        ctx.strokeStyle = 'rgba(45, 212, 191, 0.15)';
+        ctx.strokeStyle = 'rgba(0, 79, 111, 0.2)';
         ctx.lineWidth = 1;
         for (let y = tpcTop + 15; y < tpcBottom; y += 15) {
             ctx.beginPath();
@@ -595,9 +416,9 @@ function animateDM() {
 
             // S1 scintillation flash
             const s1Gradient = ctx.createRadialGradient(cx, interactionPoint, 0, cx, interactionPoint, flashRadius);
-            s1Gradient.addColorStop(0, `rgba(45, 212, 191, ${flashOpacity})`);
-            s1Gradient.addColorStop(0.5, `rgba(45, 212, 191, ${flashOpacity * 0.5})`);
-            s1Gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
+            s1Gradient.addColorStop(0, `rgba(161, 214, 58, ${flashOpacity})`);
+            s1Gradient.addColorStop(0.5, `rgba(161, 214, 58, ${flashOpacity * 0.5})`);
+            s1Gradient.addColorStop(1, 'rgba(161, 214, 58, 0)');
 
             ctx.fillStyle = s1Gradient;
             ctx.beginPath();
@@ -620,14 +441,14 @@ function animateDM() {
             for (let i = 0; i < 5; i++) {
                 const offsetX = (Math.sin(phase * 0.1 + i) * 8);
                 const offsetY = i * 5;
-                ctx.fillStyle = `rgba(45, 212, 191, ${0.6 * (1 - driftProgress * 0.5)})`;
+                ctx.fillStyle = `rgba(47, 148, 106, ${0.6 * (1 - driftProgress * 0.5)})`;
                 ctx.beginPath();
                 ctx.arc(cx + offsetX, electronY + offsetY, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             // Drift path
-            ctx.strokeStyle = `rgba(45, 212, 191, ${0.2 * (1 - driftProgress)})`;
+            ctx.strokeStyle = `rgba(47, 148, 106, ${0.3 * (1 - driftProgress)})`;
             ctx.lineWidth = 1;
             ctx.setLineDash([2, 2]);
             ctx.beginPath();
@@ -646,9 +467,9 @@ function animateDM() {
 
             // S2 scintillation flash (larger than S1)
             const s2Gradient = ctx.createRadialGradient(cx, s2Y, 0, cx, s2Y, s2Radius);
-            s2Gradient.addColorStop(0, `rgba(45, 212, 191, ${s2Opacity})`);
-            s2Gradient.addColorStop(0.4, `rgba(45, 212, 191, ${s2Opacity * 0.6})`);
-            s2Gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
+            s2Gradient.addColorStop(0, `rgba(161, 214, 58, ${s2Opacity})`);
+            s2Gradient.addColorStop(0.4, `rgba(161, 214, 58, ${s2Opacity * 0.6})`);
+            s2Gradient.addColorStop(1, 'rgba(161, 214, 58, 0)');
 
             ctx.fillStyle = s2Gradient;
             ctx.beginPath();
@@ -668,11 +489,11 @@ function animateDM() {
             ctx.font = '9px monospace';
             ctx.fillText('DM particle', cx + 10, tpcTop + 30);
         } else if (phase >= 40 && phase < 80) {
-            ctx.fillStyle = 'rgba(45, 212, 191, 0.7)';
+            ctx.fillStyle = 'rgba(0, 79, 111, 0.8)';
             ctx.font = '9px monospace';
             ctx.fillText('S1', cx + 18, interactionPoint);
         } else if (phase >= 140 && phase < 180) {
-            ctx.fillStyle = 'rgba(45, 212, 191, 0.7)';
+            ctx.fillStyle = 'rgba(0, 79, 111, 0.8)';
             ctx.font = '9px monospace';
             ctx.fillText('S2', cx + 28, tpcTop + 20);
         }
@@ -707,24 +528,24 @@ function animateKCWI() {
         const cubeSize = 40;
 
         // Back face
-        ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
+        ctx.strokeStyle = 'rgba(0, 79, 111, 0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2 + 10, cy - cubeSize / 2 - 10, cubeSize, cubeSize);
         ctx.stroke();
 
         // Front face
-        ctx.strokeStyle = '#2dd4bf';
+        ctx.strokeStyle = '#004F6F';
         ctx.lineWidth = 2;
         ctx.shadowBlur = 8;
-        ctx.shadowColor = '#2dd4bf';
+        ctx.shadowColor = 'rgba(0, 79, 111, 0.2)';
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2, cy - cubeSize / 2, cubeSize, cubeSize);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
         // Connect corners
-        ctx.strokeStyle = 'rgba(45, 212, 191, 0.5)';
+        ctx.strokeStyle = 'rgba(0, 79, 111, 0.5)';
         ctx.lineWidth = 1;
         [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => {
             ctx.beginPath();
@@ -737,7 +558,7 @@ function animateKCWI() {
         for (let i = 0; i < 3; i++) {
             const offset = (phase + i * 20) % 60;
             const alpha = 1 - offset / 60;
-            ctx.strokeStyle = `rgba(163, 230, 53, ${alpha})`;
+            ctx.strokeStyle = `rgba(161, 214, 58, ${alpha})`;
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             const y = cy - 15 + i * 15 - offset * 0.5;
