@@ -70,81 +70,171 @@ function initBackgroundSimulation() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Watercolor Nebula Blob class
-    class NebulaBlob {
+    // Simulation parameters
+    const blackHole = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        mass: 1000
+    };
+
+    const particles = [];
+    const numParticles = 150;
+    const numStars = 50;
+
+    // Particle class for accretion disk
+    class Particle {
         constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.radius = Math.random() * 300 + 200;
-            this.vx = (Math.random() - 0.5) * 0.2;
-            this.vy = (Math.random() - 0.5) * 0.2;
-
-            // Palette: Deep Teal, Turquoise, Matcha Bright
-            const colors = [
-                'rgba(0, 79, 111, 0.08)',   // Deep Teal (very transparent)
-                'rgba(47, 148, 106, 0.08)', // Turquoise
-                'rgba(161, 214, 58, 0.12)'  // Matcha Bright
-            ];
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-
-            // Morphing properties
-            this.angle = Math.random() * Math.PI * 2;
-            this.morphSpeed = Math.random() * 0.002 + 0.001;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 300;
+            this.x = blackHole.x + Math.cos(angle) * distance;
+            this.y = blackHole.y + Math.sin(angle) * distance;
+            this.vx = Math.random() * 2 - 1;
+            this.vy = Math.random() * 2 - 1;
+            this.size = Math.random() * 1.5 + 0.5;
+            this.opacity = Math.random() * 0.5 + 0.3;
+            this.color = Math.random() > 0.5 ? '#60a5fa' : '#818cf8';
         }
 
         update() {
+            // Calculate gravitational force
+            const dx = blackHole.x - this.x;
+            const dy = blackHole.y - this.y;
+            const distSq = dx * dx + dy * dy;
+            const dist = Math.sqrt(distSq);
+
+            // Prevent division by zero
+            if (dist < 5) {
+                this.reset();
+                return;
+            }
+
+            // Gravitational acceleration
+            const force = blackHole.mass / distSq;
+            const ax = (dx / dist) * force;
+            const ay = (dy / dist) * force;
+
+            // Update velocity and position
+            this.vx += ax * 0.01;
+            this.vy += ay * 0.01;
+
+            // Add tangential velocity for orbital motion
+            const tangentX = -dy / dist;
+            const tangentY = dx / dist;
+            this.vx += tangentX * 0.5;
+            this.vy += tangentY * 0.5;
+
+            // Apply velocity damping
+            this.vx *= 0.99;
+            this.vy *= 0.99;
+
             this.x += this.vx;
             this.y += this.vy;
-            this.angle += this.morphSpeed;
 
-            // Wrap around screen
-            if (this.x < -this.radius) this.x = canvas.width + this.radius;
-            if (this.x > canvas.width + this.radius) this.x = -this.radius;
-            if (this.y < -this.radius) this.y = canvas.height + this.radius;
-            if (this.y > canvas.height + this.radius) this.y = -this.radius;
+            // Reset if too far
+            if (dist > 600) {
+                this.reset();
+            }
+        }
+
+        reset() {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 300;
+            this.x = blackHole.x + Math.cos(angle) * distance;
+            this.y = blackHole.y + Math.sin(angle) * distance;
+            this.vx = Math.random() * 2 - 1;
+            this.vy = Math.random() * 2 - 1;
         }
 
         draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.angle);
-
-            // Create organic blob shape
             ctx.beginPath();
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius);
-            gradient.addColorStop(0, this.color);
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-            ctx.fillStyle = gradient;
-            // Draw a slightly distorted circle
-            ctx.scale(1 + Math.sin(this.angle) * 0.2, 1 + Math.cos(this.angle) * 0.1);
-            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = this.opacity;
             ctx.fill();
-
-            ctx.restore();
+            ctx.globalAlpha = 1;
         }
     }
 
-    // Initialize blobs
-    const blobs = [];
-    const numBlobs = 12; // Enough to cover the screen with overlap
-    for (let i = 0; i < numBlobs; i++) {
-        blobs.push(new NebulaBlob());
+    // Star class for background
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 1.5;
+            this.opacity = Math.random() * 0.5 + 0.3;
+            this.twinkleSpeed = Math.random() * 0.02 + 0.01;
+            this.twinklePhase = Math.random() * Math.PI * 2;
+        }
+
+        update() {
+            this.twinklePhase += this.twinkleSpeed;
+            this.opacity = 0.3 + Math.sin(this.twinklePhase) * 0.3;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.globalAlpha = this.opacity;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    // Initialize particles and stars
+    for (let i = 0; i < numParticles; i++) {
+        particles.push(new Particle());
+    }
+
+    const stars = [];
+    for (let i = 0; i < numStars; i++) {
+        stars.push(new Star());
     }
 
     // Animation loop
     function animate() {
+        // Update black hole position to center
+        blackHole.x = canvas.width / 2;
+        blackHole.y = canvas.height / 2;
+
+        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Use multiply blending for watercolor effect
-        ctx.globalCompositeOperation = 'multiply';
-
-        blobs.forEach(blob => {
-            blob.update();
-            blob.draw();
+        // Draw stars
+        stars.forEach(star => {
+            star.update();
+            star.draw();
         });
 
-        ctx.globalCompositeOperation = 'source-over';
+        // Draw black hole (event horizon)
+        ctx.beginPath();
+        ctx.arc(blackHole.x, blackHole.y, 15, 0, Math.PI * 2);
+        const gradient = ctx.createRadialGradient(
+            blackHole.x, blackHole.y, 0,
+            blackHole.x, blackHole.y, 30
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(0.5, 'rgba(96, 165, 250, 0.3)');
+        gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Update and draw particles
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw();
+        });
+
+        // Draw AGN outflow jets (subtle lines)
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(blackHole.x, blackHole.y - 15);
+        ctx.lineTo(blackHole.x, blackHole.y - 200);
+        ctx.moveTo(blackHole.x, blackHole.y + 15);
+        ctx.lineTo(blackHole.x, blackHole.y + 200);
+        ctx.stroke();
+
         requestAnimationFrame(animate);
     }
 
@@ -164,6 +254,9 @@ function initResearchCards() {
 
     // Dark Matter Animation
     animateDM();
+
+    // Machine Learning Animation
+    animateML();
 
     // KCWI Data Reduction Animation
     animateKCWI();
@@ -189,12 +282,12 @@ function animateAGN() {
         const coneHeight = 60;
         const coneWidth = 35;
 
-        // Draw LEFT CONE (Turquoise - Blueshift)
+        // Draw LEFT CONE (BLUE - Blueshift)
         // Top left cone
         const leftGradientTop = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy - coneHeight);
-        leftGradientTop.addColorStop(0, 'rgba(47, 148, 106, 0.1)');
-        leftGradientTop.addColorStop(0.5, 'rgba(47, 148, 106, 0.3)');
-        leftGradientTop.addColorStop(1, 'rgba(47, 148, 106, 0.5)');
+        leftGradientTop.addColorStop(0, 'rgba(96, 165, 250, 0.1)');
+        leftGradientTop.addColorStop(0.5, 'rgba(96, 165, 250, 0.4)');
+        leftGradientTop.addColorStop(1, 'rgba(96, 165, 250, 0.6)');
 
         ctx.fillStyle = leftGradientTop;
         ctx.beginPath();
@@ -206,9 +299,9 @@ function animateAGN() {
 
         // Bottom left cone
         const leftGradientBottom = ctx.createLinearGradient(cx, cy, cx - coneWidth, cy + coneHeight);
-        leftGradientBottom.addColorStop(0, 'rgba(47, 148, 106, 0.1)');
-        leftGradientBottom.addColorStop(0.5, 'rgba(47, 148, 106, 0.3)');
-        leftGradientBottom.addColorStop(1, 'rgba(47, 148, 106, 0.5)');
+        leftGradientBottom.addColorStop(0, 'rgba(96, 165, 250, 0.1)');
+        leftGradientBottom.addColorStop(0.5, 'rgba(96, 165, 250, 0.4)');
+        leftGradientBottom.addColorStop(1, 'rgba(96, 165, 250, 0.6)');
 
         ctx.fillStyle = leftGradientBottom;
         ctx.beginPath();
@@ -247,7 +340,7 @@ function animateAGN() {
         ctx.closePath();
         ctx.fill();
 
-        // Draw flowing particles in left cone (Deep Teal)
+        // Draw flowing particles in left cone (blue)
         for (let i = 0; i < 6; i++) {
             const offset = (flowPhase + i * 15) % 60;
             const progress = offset / 60;
@@ -256,7 +349,7 @@ function animateAGN() {
             const x2 = cx - progress * coneWidth;
             const y2 = cy + progress * coneHeight;
 
-            ctx.fillStyle = `rgba(0, 79, 111, ${1 - progress})`;
+            ctx.fillStyle = `rgba(96, 165, 250, ${1 - progress})`;
             ctx.beginPath();
             ctx.arc(x1, y1, 2, 0, Math.PI * 2);
             ctx.fill();
@@ -317,35 +410,43 @@ function animateGC() {
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
+    const stars = [];
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    let phase = 0;
+
+    for (let i = 0; i < 20; i++) {
+        stars.push({
+            angle: Math.random() * Math.PI * 2,
+            radius: Math.random() * 50 + 10,
+            speed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
+            size: Math.random() * 2 + 1
+        });
+    }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw center (Matcha Bright)
-        ctx.fillStyle = '#A1D63A';
+        // Draw center
+        ctx.fillStyle = '#60a5fa';
         ctx.beginPath();
         ctx.arc(cx, cy, 4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw stars (Deep Teal)
-        for (let i = 0; i < 12; i++) {
-            const angle = (phase * 0.05 + i) % (Math.PI * 2);
-            const r = 20 + Math.sin(phase * 0.02 + i) * 5;
-            const x = cx + Math.cos(angle) * r;
-            const y = cy + Math.sin(angle) * r;
+        // Draw orbiting stars
+        stars.forEach(star => {
+            star.angle += star.speed;
+            const x = cx + Math.cos(star.angle) * star.radius;
+            const y = cy + Math.sin(star.angle) * star.radius * 0.6;
 
-            ctx.fillStyle = '#004F6F';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.arc(x, y, star.size, 0, Math.PI * 2);
             ctx.fill();
-        }
+        });
 
-        phase++;
         requestAnimationFrame(draw);
     }
+
     draw();
 }
 
@@ -372,12 +473,12 @@ function animateDM() {
         const interactionPoint = tpcBottom - 30; // Where particle interacts
 
         // Draw TPC chamber outline
-        ctx.strokeStyle = 'rgba(0, 79, 111, 0.5)';
+        ctx.strokeStyle = 'rgba(129, 140, 248, 0.3)';
         ctx.lineWidth = 2;
         ctx.strokeRect(cx - 40, tpcTop, 80, tpcHeight);
 
         // Draw horizontal lines for TPC structure
-        ctx.strokeStyle = 'rgba(0, 79, 111, 0.2)';
+        ctx.strokeStyle = 'rgba(129, 140, 248, 0.15)';
         ctx.lineWidth = 1;
         for (let y = tpcTop + 15; y < tpcBottom; y += 15) {
             ctx.beginPath();
@@ -416,9 +517,9 @@ function animateDM() {
 
             // S1 scintillation flash
             const s1Gradient = ctx.createRadialGradient(cx, interactionPoint, 0, cx, interactionPoint, flashRadius);
-            s1Gradient.addColorStop(0, `rgba(161, 214, 58, ${flashOpacity})`);
-            s1Gradient.addColorStop(0.5, `rgba(161, 214, 58, ${flashOpacity * 0.5})`);
-            s1Gradient.addColorStop(1, 'rgba(161, 214, 58, 0)');
+            s1Gradient.addColorStop(0, `rgba(129, 140, 248, ${flashOpacity})`);
+            s1Gradient.addColorStop(0.5, `rgba(129, 140, 248, ${flashOpacity * 0.5})`);
+            s1Gradient.addColorStop(1, 'rgba(129, 140, 248, 0)');
 
             ctx.fillStyle = s1Gradient;
             ctx.beginPath();
@@ -441,14 +542,14 @@ function animateDM() {
             for (let i = 0; i < 5; i++) {
                 const offsetX = (Math.sin(phase * 0.1 + i) * 8);
                 const offsetY = i * 5;
-                ctx.fillStyle = `rgba(47, 148, 106, ${0.6 * (1 - driftProgress * 0.5)})`;
+                ctx.fillStyle = `rgba(96, 165, 250, ${0.6 * (1 - driftProgress * 0.5)})`;
                 ctx.beginPath();
                 ctx.arc(cx + offsetX, electronY + offsetY, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             // Drift path
-            ctx.strokeStyle = `rgba(47, 148, 106, ${0.3 * (1 - driftProgress)})`;
+            ctx.strokeStyle = `rgba(96, 165, 250, ${0.2 * (1 - driftProgress)})`;
             ctx.lineWidth = 1;
             ctx.setLineDash([2, 2]);
             ctx.beginPath();
@@ -467,9 +568,9 @@ function animateDM() {
 
             // S2 scintillation flash (larger than S1)
             const s2Gradient = ctx.createRadialGradient(cx, s2Y, 0, cx, s2Y, s2Radius);
-            s2Gradient.addColorStop(0, `rgba(161, 214, 58, ${s2Opacity})`);
-            s2Gradient.addColorStop(0.4, `rgba(161, 214, 58, ${s2Opacity * 0.6})`);
-            s2Gradient.addColorStop(1, 'rgba(161, 214, 58, 0)');
+            s2Gradient.addColorStop(0, `rgba(96, 165, 250, ${s2Opacity})`);
+            s2Gradient.addColorStop(0.4, `rgba(96, 165, 250, ${s2Opacity * 0.6})`);
+            s2Gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
 
             ctx.fillStyle = s2Gradient;
             ctx.beginPath();
@@ -489,11 +590,11 @@ function animateDM() {
             ctx.font = '9px monospace';
             ctx.fillText('DM particle', cx + 10, tpcTop + 30);
         } else if (phase >= 40 && phase < 80) {
-            ctx.fillStyle = 'rgba(0, 79, 111, 0.8)';
+            ctx.fillStyle = 'rgba(129, 140, 248, 0.7)';
             ctx.font = '9px monospace';
             ctx.fillText('S1', cx + 18, interactionPoint);
         } else if (phase >= 140 && phase < 180) {
-            ctx.fillStyle = 'rgba(0, 79, 111, 0.8)';
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.7)';
             ctx.font = '9px monospace';
             ctx.fillText('S2', cx + 28, tpcTop + 20);
         }
@@ -505,6 +606,66 @@ function animateDM() {
     draw();
 }
 
+function animateML() {
+    const container = document.getElementById('ml-animation');
+    if (!container) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const nodes = [];
+    const layers = [4, 6, 6, 3];
+    const layerSpacing = canvas.width / (layers.length + 1);
+
+    // Create neural network nodes
+    layers.forEach((count, layerIndex) => {
+        const x = layerSpacing * (layerIndex + 1);
+        const nodeSpacing = canvas.height / (count + 1);
+
+        for (let i = 0; i < count; i++) {
+            nodes.push({
+                x: x,
+                y: nodeSpacing * (i + 1),
+                layer: layerIndex,
+                activation: Math.random()
+            });
+        }
+    });
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw connections
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.1)';
+        ctx.lineWidth = 1;
+        nodes.forEach((node, i) => {
+            nodes.forEach((otherNode, j) => {
+                if (otherNode.layer === node.layer + 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(node.x, node.y);
+                    ctx.lineTo(otherNode.x, otherNode.y);
+                    ctx.stroke();
+                }
+            });
+        });
+
+        // Draw nodes
+        nodes.forEach(node => {
+            node.activation = 0.3 + Math.sin(Date.now() * 0.001 + node.x + node.y) * 0.3;
+            ctx.fillStyle = `rgba(96, 165, 250, ${node.activation})`;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+}
 
 function animateKCWI() {
     const container = document.getElementById('kcwi-animation');
@@ -528,24 +689,24 @@ function animateKCWI() {
         const cubeSize = 40;
 
         // Back face
-        ctx.strokeStyle = 'rgba(0, 79, 111, 0.3)';
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2 + 10, cy - cubeSize / 2 - 10, cubeSize, cubeSize);
         ctx.stroke();
 
         // Front face
-        ctx.strokeStyle = '#004F6F';
+        ctx.strokeStyle = '#60a5fa';
         ctx.lineWidth = 2;
         ctx.shadowBlur = 8;
-        ctx.shadowColor = 'rgba(0, 79, 111, 0.2)';
+        ctx.shadowColor = '#60a5fa';
         ctx.beginPath();
         ctx.rect(cx - cubeSize / 2, cy - cubeSize / 2, cubeSize, cubeSize);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
         // Connect corners
-        ctx.strokeStyle = 'rgba(0, 79, 111, 0.5)';
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.5)';
         ctx.lineWidth = 1;
         [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => {
             ctx.beginPath();
@@ -558,7 +719,7 @@ function animateKCWI() {
         for (let i = 0; i < 3; i++) {
             const offset = (phase + i * 20) % 60;
             const alpha = 1 - offset / 60;
-            ctx.strokeStyle = `rgba(161, 214, 58, ${alpha})`;
+            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             const y = cy - 15 + i * 15 - offset * 0.5;
@@ -643,10 +804,10 @@ function initModal() {
                     ctx.restore();
 
                     // Draw narrow Gaussian
-                    ctx.strokeStyle = '#2dd4bf';
+                    ctx.strokeStyle = '#60a5fa';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#2dd4bf';
+                    ctx.shadowColor = '#60a5fa';
                     ctx.beginPath();
                     const centerX = w / 2;
                     const sigma = 15;
@@ -745,11 +906,11 @@ function initModal() {
 
                     const centerX = w / 2;
 
-                    // Component 1: Narrow core (teal)
-                    ctx.strokeStyle = '#2dd4bf';
+                    // Component 1: Narrow core (green)
+                    ctx.strokeStyle = '#10b981';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#2dd4bf';
+                    ctx.shadowColor = '#10b981';
                     ctx.beginPath();
                     for (let x = 50; x < w - 30; x++) {
                         const dx = x - centerX;
@@ -760,11 +921,11 @@ function initModal() {
                     ctx.stroke();
                     ctx.shadowBlur = 0;
 
-                    // Component 2: Intermediate (lime)
-                    ctx.strokeStyle = '#a3e635';
+                    // Component 2: Intermediate (blue)
+                    ctx.strokeStyle = '#60a5fa';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#a3e635';
+                    ctx.shadowColor = '#60a5fa';
                     ctx.beginPath();
                     for (let x = 50; x < w - 30; x++) {
                         const dx = x - centerX;
@@ -776,10 +937,10 @@ function initModal() {
                     ctx.shadowBlur = 0;
 
                     // Component 3: Broad wing (red)
-                    ctx.strokeStyle = '#ef4444';
+                    ctx.strokeStyle = '#f87171';
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowColor = '#f87171';
                     ctx.beginPath();
                     for (let x = 50; x < w - 30; x++) {
                         const dx = x - centerX - 40; // Offset for blueshift
@@ -810,17 +971,17 @@ function initModal() {
                     const legendY = 40;
                     ctx.font = '11px sans-serif';
 
-                    ctx.fillStyle = '#2dd4bf';
+                    ctx.fillStyle = '#10b981';
                     ctx.fillRect(legendX, legendY, 15, 3);
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillText('Narrow core', legendX + 20, legendY + 3);
 
-                    ctx.fillStyle = '#a3e635';
+                    ctx.fillStyle = '#60a5fa';
                     ctx.fillRect(legendX, legendY + 15, 15, 3);
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillText('Intermediate', legendX + 20, legendY + 18);
 
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#f87171';
                     ctx.fillRect(legendX, legendY + 30, 15, 3);
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillText('Broad wing', legendX + 20, legendY + 33);
@@ -917,7 +1078,7 @@ function initModal() {
                         if (x >= 0 && x <= w && y >= 0 && y <= h) {
                             ctx.fillStyle = '#ffffff';
                             ctx.shadowBlur = 6;
-                            ctx.shadowColor = '#a3e635';
+                            ctx.shadowColor = '#60a5fa';
                             ctx.beginPath();
                             ctx.arc(x, y, size, 0, Math.PI * 2);
                             ctx.fill();
@@ -964,10 +1125,10 @@ function initModal() {
                     });
 
                     // Draw King profile curve
-                    ctx.strokeStyle = '#2dd4bf';
+                    ctx.strokeStyle = '#60a5fa';
                     ctx.lineWidth = 3;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#2dd4bf';
+                    ctx.shadowColor = '#60a5fa';
                     ctx.beginPath();
 
                     const rc = 3; // Core radius
@@ -1042,9 +1203,9 @@ function initModal() {
                     ctx.setLineDash([]);
 
                     // Binary stars
-                    ctx.fillStyle = '#2dd4bf';
+                    ctx.fillStyle = '#60a5fa';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#2dd4bf';
+                    ctx.shadowColor = '#60a5fa';
                     ctx.beginPath();
                     ctx.arc(star1X, star1Y, 5, 0, Math.PI * 2);
                     ctx.fill();
@@ -1056,16 +1217,16 @@ function initModal() {
                     // Intruder star
                     const intruderX = cx - 100;
                     const intruderY = cy - 60;
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#f87171';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowColor = '#f87171';
                     ctx.beginPath();
                     ctx.arc(intruderX, intruderY, 5, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.shadowBlur = 0;
 
                     // Approach arrow
-                    ctx.strokeStyle = '#ef4444';
+                    ctx.strokeStyle = '#f87171';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(intruderX + 10, intruderY + 10);
@@ -1073,7 +1234,7 @@ function initModal() {
                     ctx.stroke();
 
                     // Arrowhead
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#f87171';
                     ctx.beginPath();
                     ctx.moveTo(cx - 50, cy - 20);
                     ctx.lineTo(cx - 55, cy - 25);
@@ -1084,7 +1245,7 @@ function initModal() {
                     // Ejection arrow (one star gets kicked out)
                     const ejectX = cx + 100;
                     const ejectY = cy + 60;
-                    ctx.strokeStyle = '#a3e635';
+                    ctx.strokeStyle = '#10b981';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(cx + 40, cy + 10);
@@ -1092,7 +1253,7 @@ function initModal() {
                     ctx.stroke();
 
                     // Arrowhead
-                    ctx.fillStyle = '#a3e635';
+                    ctx.fillStyle = '#10b981';
                     ctx.beginPath();
                     ctx.moveTo(ejectX - 10, ejectY - 10);
                     ctx.lineTo(ejectX - 15, ejectY - 15);
@@ -1161,9 +1322,9 @@ function initModal() {
 
                     // Draw particle interaction
                     const interactionY = h - 60;
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#f87171';
                     ctx.shadowBlur = 12;
-                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowColor = '#f87171';
                     ctx.beginPath();
                     ctx.arc(w / 2, interactionY, 4, 0, Math.PI * 2);
                     ctx.fill();
@@ -1173,10 +1334,10 @@ function initModal() {
                     for (let i = 0; i < 8; i++) {
                         const angle = (Math.PI * 2 * i) / 8;
                         const length = 25;
-                        ctx.strokeStyle = '#2dd4bf';
+                        ctx.strokeStyle = '#60a5fa';
                         ctx.lineWidth = 2;
                         ctx.shadowBlur = 8;
-                        ctx.shadowColor = '#2dd4bf';
+                        ctx.shadowColor = '#60a5fa';
                         ctx.beginPath();
                         ctx.moveTo(w / 2, interactionY);
                         ctx.lineTo(w / 2 + Math.cos(angle) * length, interactionY + Math.sin(angle) * length);
@@ -1202,9 +1363,9 @@ function initModal() {
 
                     // Interaction point
                     const interactionY = h - 60;
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#f87171';
                     ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowColor = '#f87171';
                     ctx.beginPath();
                     ctx.arc(w / 2, interactionY, 3, 0, Math.PI * 2);
                     ctx.fill();
@@ -1214,9 +1375,9 @@ function initModal() {
                     for (let i = 0; i < 4; i++) {
                         const y = interactionY - 20 - i * 15;
                         const x = w / 2 + (Math.sin(i) * 5);
-                        ctx.fillStyle = '#2dd4bf';
+                        ctx.fillStyle = '#60a5fa';
                         ctx.shadowBlur = 6;
-                        ctx.shadowColor = '#2dd4bf';
+                        ctx.shadowColor = '#60a5fa';
                         ctx.beginPath();
                         ctx.arc(x, y, 2, 0, Math.PI * 2);
                         ctx.fill();
@@ -1224,7 +1385,7 @@ function initModal() {
                     ctx.shadowBlur = 0;
 
                     // Drift arrow
-                    ctx.strokeStyle = '#2dd4bf';
+                    ctx.strokeStyle = '#60a5fa';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([3, 3]);
                     ctx.beginPath();
@@ -1238,10 +1399,10 @@ function initModal() {
                     for (let i = 0; i < 12; i++) {
                         const angle = (Math.PI * 2 * i) / 12;
                         const length = 20;
-                        ctx.strokeStyle = '#a3e635';
+                        ctx.strokeStyle = '#10b981';
                         ctx.lineWidth = 2;
                         ctx.shadowBlur = 10;
-                        ctx.shadowColor = '#a3e635';
+                        ctx.shadowColor = '#10b981';
                         ctx.beginPath();
                         ctx.moveTo(w / 2, s2Y);
                         ctx.lineTo(w / 2 + Math.cos(angle) * length, s2Y + Math.sin(angle) * length);
@@ -1281,10 +1442,10 @@ function initModal() {
 
                     // Large S2 peak
                     const s2X = 150;
-                    ctx.strokeStyle = '#a3e635';
+                    ctx.strokeStyle = '#10b981';
                     ctx.lineWidth = 3;
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#a3e635';
+                    ctx.shadowColor = '#10b981';
                     ctx.beginPath();
                     for (let x = s2X - 30; x < s2X + 30; x++) {
                         const dx = x - s2X;
@@ -1296,17 +1457,17 @@ function initModal() {
                     ctx.shadowBlur = 0;
 
                     // Label S2
-                    ctx.fillStyle = '#a3e635';
+                    ctx.fillStyle = '#10b981';
                     ctx.font = '12px sans-serif';
                     ctx.fillText('S2', s2X - 8, 40);
 
                     // Delayed single electrons
                     const delays = [250, 320, 410, 480];
                     delays.forEach((x, i) => {
-                        ctx.strokeStyle = '#ef4444';
+                        ctx.strokeStyle = '#f87171';
                         ctx.lineWidth = 2;
                         ctx.shadowBlur = 8;
-                        ctx.shadowColor = '#ef4444';
+                        ctx.shadowColor = '#f87171';
                         ctx.beginPath();
                         for (let dx = x - 8; dx < x + 8; dx++) {
                             const offset = dx - x;
@@ -1319,7 +1480,7 @@ function initModal() {
 
                         // Mark as delayed
                         if (i === 0) {
-                            ctx.fillStyle = '#ef4444';
+                            ctx.fillStyle = '#f87171';
                             ctx.font = '9px sans-serif';
                             ctx.fillText('Delayed', x - 18, h - 50);
                             ctx.fillText('SE', x - 8, h - 38);
@@ -1346,9 +1507,9 @@ function initModal() {
 
                     // S2 peak
                     const s2X = 120;
-                    ctx.fillStyle = '#a3e635';
+                    ctx.fillStyle = '#10b981';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#a3e635';
+                    ctx.shadowColor = '#10b981';
                     ctx.beginPath();
                     ctx.arc(s2X, h / 2, 8, 0, Math.PI * 2);
                     ctx.fill();
@@ -1367,16 +1528,16 @@ function initModal() {
 
                     delays.forEach((pos, i) => {
                         // Delayed electron
-                        ctx.fillStyle = '#ef4444';
+                        ctx.fillStyle = '#f87171';
                         ctx.shadowBlur = 8;
-                        ctx.shadowColor = '#ef4444';
+                        ctx.shadowColor = '#f87171';
                         ctx.beginPath();
                         ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.shadowBlur = 0;
 
                         // Matching arrow
-                        ctx.strokeStyle = '#2dd4bf';
+                        ctx.strokeStyle = '#60a5fa';
                         ctx.lineWidth = 2;
                         ctx.setLineDash([4, 4]);
                         ctx.beginPath();
@@ -1458,280 +1619,21 @@ function initModal() {
             collaborators: ['Prof. Javier Duarte', 'CMS Collaboration']
         },
         kcwi: {
-            title: 'KCWI/KCRM Data Reduction',
+            title: 'KCWI/KCRM Reduction',
             advisor: 'Prof. Alison Coil',
             description: `
-                <p style="margin-bottom: 2rem;">The Keck Cosmic Web Imager (KCWI) and Keck Cosmic Reionization Mapper (KCRM) produce 3D data cubes containing spatial and spectral information. Reduction of these datasets requires careful calibration, sky subtraction, and mosaicking to create science-ready cubes for spectroscopic analysis.</p>
+                <p style="margin-bottom: 2rem;">Complete documentation for reducing KCWI (Keck Cosmic Web Imager) and KCRM integral field spectroscopy data, including flux calibration, sky subtraction, and mosaicking workflows.</p>
                 
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Four-Step Workflow</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                    <div>
-                        <canvas id="kcwi-step1" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>1. Initial Calibration (KCWI DRP)</strong><br>Bias/dark subtraction, flat fields, wavelength calibration, geometric rectification.</p>
-                    </div>
-                    <div>
-                        <canvas id="kcwi-step2" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>2. Flux Calibration (KSkyWizard)</strong><br>Construct sensitivity and telluric correction curves using standard star observations.</p>
-                    </div>
-                    <div>
-                        <canvas id="kcwi-step3" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>3. Sky Subtraction (ZAP)</strong><br>PCA-based sky modeling and subtraction using ZAP.</p>
-                    </div>
-                    <div>
-                        <canvas id="kcwi-step4" width="300" height="200" style="width: 100%; background: rgba(0,0,0,0.3); border-radius: 8px;"></canvas>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;"><strong>4. Resampling & Mosaicking</strong><br>Resample cubes, align pointings, and build final mosaics.</p>
-                    </div>
+                <div style="margin-bottom: 1rem;">
+                    <a href="kcwi-reduction.pdf" class="btn btn-primary" download style="display: inline-block; margin-right: 1rem;">Download PDF</a>
+                    <a href="kcwi-reduction.pdf" class="btn btn-secondary" target="_blank" style="display: inline-block;">View in New Tab</a>
                 </div>
                 
-                <p style="font-style: italic; color: #cbd5e1; margin-bottom: 2rem;">These steps convert raw KCWI/KCRM exposures into calibrated, sky-subtracted, mosaicked cubes ready for emission-line fitting and kinematic mapping.</p>
-                
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Key Challenges</h3>
-                <ul style="margin-left: 1.5rem; margin-bottom: 2rem; color: #cbd5e1;">
-                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Sky Residuals:</strong> Removing sky emission without affecting galaxy signal</li>
-                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Tellurics:</strong> Correcting atmospheric absorption in redder wavelengths</li>
-                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Flux Calibration:</strong> Ensuring accurate sensitivity across full wavelength range</li>
-                    <li style="margin-bottom: 0.5rem;"><strong style="color: #60a5fa;">Alignment:</strong> Matching spatial offsets and rotations between exposures</li>
-                </ul>
-                
-                <p style="margin-top: 2rem;">This reduction pipeline enables high-fidelity measurements of galaxy kinematics, spatially resolved emission lines, and AGN-driven outflows.</p>
+                <div style="margin-top: 2rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3);">
+                    <iframe src="kcwi-reduction.pdf" width="100%" height="800px" style="border: none;"></iframe>
+                </div>
             `,
-            collaborators: ['Prof. Alison Coil', 'KCWI Team'],
-            initVisuals: function () {
-                // Step 1: Initial Calibration Pipeline
-                const step1Canvas = document.getElementById('kcwi-step1');
-                if (step1Canvas) {
-                    const ctx = step1Canvas.getContext('2d');
-                    const w = step1Canvas.width;
-                    const h = step1Canvas.height;
-
-                    ctx.clearRect(0, 0, w, h);
-
-                    // Draw pipeline flow
-                    const steps = ['Raw', 'Bias', 'Flat', 'Arc', 'Cube'];
-                    const stepWidth = (w - 60) / 5;
-
-                    steps.forEach((label, i) => {
-                        const x = 30 + i * stepWidth;
-                        const y = h / 2;
-
-                        // Box
-                        ctx.fillStyle = i === steps.length - 1 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(96, 165, 250, 0.2)';
-                        ctx.strokeStyle = i === steps.length - 1 ? '#10b981' : '#60a5fa';
-                        ctx.lineWidth = 2;
-                        ctx.fillRect(x - 20, y - 15, 40, 30);
-                        ctx.strokeRect(x - 20, y - 15, 40, 30);
-
-                        // Label
-                        ctx.fillStyle = '#cbd5e1';
-                        ctx.font = '10px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(label, x, y + 4);
-
-                        // Arrow
-                        if (i < steps.length - 1) {
-                            ctx.strokeStyle = '#60a5fa';
-                            ctx.lineWidth = 1.5;
-                            ctx.beginPath();
-                            ctx.moveTo(x + 20, y);
-                            ctx.lineTo(x + stepWidth - 20, y);
-                            ctx.stroke();
-
-                            // Arrowhead
-                            ctx.fillStyle = '#60a5fa';
-                            ctx.beginPath();
-                            ctx.moveTo(x + stepWidth - 20, y);
-                            ctx.lineTo(x + stepWidth - 25, y - 3);
-                            ctx.lineTo(x + stepWidth - 25, y + 3);
-                            ctx.closePath();
-                            ctx.fill();
-                        }
-                    });
-                }
-
-                // Step 2: Flux Calibration
-                const step2Canvas = document.getElementById('kcwi-step2');
-                if (step2Canvas) {
-                    const ctx = step2Canvas.getContext('2d');
-                    const w = step2Canvas.width;
-                    const h = step2Canvas.height;
-
-                    ctx.clearRect(0, 0, w, h);
-
-                    // Draw standard star spectrum
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.lineWidth = 1;
-                    ctx.setLineDash([2, 2]);
-                    ctx.beginPath();
-                    for (let x = 40; x < w - 30; x += 2) {
-                        const noise = Math.random() * 10 - 5;
-                        const y = h - 50 - 40 * Math.sin((x - 40) / 30) + noise;
-                        if (x === 40) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-
-                    // Draw sensitivity curve (smooth spline)
-                    ctx.strokeStyle = '#10b981';
-                    ctx.lineWidth = 2.5;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#10b981';
-                    ctx.beginPath();
-                    for (let x = 40; x < w - 30; x++) {
-                        const y = h - 50 - 40 * Math.sin((x - 40) / 30);
-                        if (x === 40) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-
-                    // Draw spline knots
-                    for (let i = 0; i < 4; i++) {
-                        const x = 60 + i * 50;
-                        const y = h - 50 - 40 * Math.sin((x - 40) / 30);
-                        ctx.fillStyle = '#f87171';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 4, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-
-                    // Labels
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.font = '10px sans-serif';
-                    ctx.fillText('Wavelength', w / 2 - 20, h - 10);
-                    ctx.save();
-                    ctx.translate(15, h / 2);
-                    ctx.rotate(-Math.PI / 2);
-                    ctx.fillText('Sensitivity', -25, 0);
-                    ctx.restore();
-                }
-
-                // Step 3: Sky Subtraction (ZAP)
-                const step3Canvas = document.getElementById('kcwi-step3');
-                if (step3Canvas) {
-                    const ctx = step3Canvas.getContext('2d');
-                    const w = step3Canvas.width;
-                    const h = step3Canvas.height;
-
-                    ctx.clearRect(0, 0, w, h);
-
-                    const midY = h / 2;
-
-                    // Raw spectrum with sky lines (top half)
-                    ctx.strokeStyle = '#f87171';
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    for (let x = 40; x < w - 30; x++) {
-                        let y = midY - 40;
-                        // Add sky emission spikes
-                        if (x % 40 < 5) y -= 20;
-                        if (x % 60 < 5) y -= 15;
-                        if (x === 40) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#f87171';
-                    ctx.font = '9px sans-serif';
-                    ctx.fillText('Raw (with sky)', 45, midY - 60);
-
-                    // Cleaned spectrum (bottom half)
-                    ctx.strokeStyle = '#10b981';
-                    ctx.lineWidth = 2;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = '#10b981';
-                    ctx.beginPath();
-                    for (let x = 40; x < w - 30; x++) {
-                        const y = midY + 40;
-                        if (x === 40) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = '#10b981';
-                    ctx.font = '9px sans-serif';
-                    ctx.fillText('Sky-subtracted', 45, midY + 65);
-
-                    // PCA arrow
-                    ctx.strokeStyle = '#60a5fa';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(w - 60, midY - 20);
-                    ctx.lineTo(w - 60, midY + 20);
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#60a5fa';
-                    ctx.beginPath();
-                    ctx.moveTo(w - 60, midY + 20);
-                    ctx.lineTo(w - 65, midY + 15);
-                    ctx.lineTo(w - 55, midY + 15);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    ctx.fillStyle = '#60a5fa';
-                    ctx.font = '9px sans-serif';
-                    ctx.fillText('PCA', w - 75, midY);
-                }
-
-                // Step 4: Mosaicking
-                const step4Canvas = document.getElementById('kcwi-step4');
-                if (step4Canvas) {
-                    const ctx = step4Canvas.getContext('2d');
-                    const w = step4Canvas.width;
-                    const h = step4Canvas.height;
-
-                    ctx.clearRect(0, 0, w, h);
-
-                    const cx = w / 2;
-                    const cy = h / 2;
-
-                    // Draw three cubes being combined
-                    const cubes = [
-                        { x: cx - 60, y: cy - 20, angle: -5 },
-                        { x: cx, y: cy - 25, angle: 0 },
-                        { x: cx + 60, y: cy - 20, angle: 5 }
-                    ];
-
-                    cubes.forEach((cube, i) => {
-                        ctx.save();
-                        ctx.translate(cube.x, cube.y);
-                        ctx.rotate(cube.angle * Math.PI / 180);
-
-                        // Cube outline
-                        ctx.strokeStyle = i === 1 ? '#60a5fa' : 'rgba(96, 165, 250, 0.5)';
-                        ctx.lineWidth = i === 1 ? 2 : 1;
-                        ctx.strokeRect(-15, -15, 30, 30);
-
-                        ctx.restore();
-                    });
-
-                    // Arrows pointing down
-                    ctx.strokeStyle = '#10b981';
-                    ctx.lineWidth = 2;
-                    cubes.forEach(cube => {
-                        ctx.beginPath();
-                        ctx.moveTo(cube.x, cube.y + 20);
-                        ctx.lineTo(cube.x, cy + 40);
-                        ctx.stroke();
-                    });
-
-                    // Final mosaic cube
-                    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
-                    ctx.strokeStyle = '#10b981';
-                    ctx.lineWidth = 2.5;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#10b981';
-                    ctx.fillRect(cx - 35, cy + 45, 70, 40);
-                    ctx.strokeRect(cx - 35, cy + 45, 70, 40);
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.font = '10px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Final Mosaic', cx, cy + 70);
-                }
-            }
+            collaborators: ['Prof. Alison Coil', 'KCWI Team']
         }
     };
 
